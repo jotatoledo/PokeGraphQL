@@ -1,6 +1,8 @@
 ﻿namespace PokeGraphQL
 {
     using HotChocolate.AspNetCore;
+    using HotChocolate.AspNetCore.GraphiQL;
+    using HotChocolate.AspNetCore.Playground;
     using HotChocolate.AspNetCore.Voyager;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
@@ -8,6 +10,7 @@
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
+    using PokeGraphQL.GraphQL;
 
     public class Startup
     {
@@ -23,6 +26,7 @@
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddElasticsearch(this.Configuration);
+            services.AddHotChocolate();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         }
 
@@ -41,10 +45,10 @@
 
             app.UseHttpsRedirection();
 
-            app.UseGraphQL()
-                .UseGraphiQL()
-                .UsePlayground()
-                .UseVoyager();
+            app.UseGraphQL("/graphql")
+                .UseGraphiQL("/graphql", "/graphiql")
+                .UsePlayground("/graphql", "/playground" )
+                .UseVoyager("/graphql", "/voyager" );
             app.UseMvc();
         }
     }
