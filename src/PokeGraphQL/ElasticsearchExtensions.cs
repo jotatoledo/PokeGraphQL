@@ -7,7 +7,7 @@
 
     internal static class ElasticsearchExtensions
     {
-        internal static void AddElasticsearch(this IServiceCollection services, IConfiguration configuration)
+        internal static IServiceCollection AddElasticsearch(this IServiceCollection services, IConfiguration configuration)
         {
             var url = configuration["elasticsearch:url"];
             var defaultIndex = configuration["elasticsearch:index"];
@@ -25,6 +25,7 @@
                 //);
 
             services.AddSingleton<IElasticClient>(s => new ElasticClient(settings));
+            return services;
         }
     }
 }

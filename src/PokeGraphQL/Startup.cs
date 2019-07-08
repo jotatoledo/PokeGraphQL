@@ -1,7 +1,10 @@
 ﻿namespace PokeGraphQL
 {
+    using HotChocolate.AspNetCore;
+    using HotChocolate.AspNetCore.Voyager;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -20,6 +23,7 @@
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddElasticsearch(this.Configuration);
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -36,6 +40,11 @@
             }
 
             app.UseHttpsRedirection();
+
+            app.UseGraphQL()
+                .UseGraphiQL()
+                .UsePlayground()
+                .UseVoyager();
             app.UseMvc();
         }
     }
