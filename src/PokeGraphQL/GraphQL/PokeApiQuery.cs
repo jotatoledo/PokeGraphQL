@@ -6,6 +6,7 @@
     using PokeGraphQL.GraphQL.Resources.Encounters;
     using PokeGraphQL.GraphQL.Resources.Games;
     using PokeGraphQL.GraphQL.Resources.Items;
+    using PokeGraphQL.GraphQL.Resources.Locations;
 
     public sealed class PokeApiQuery : ObjectType
     {
@@ -91,6 +92,23 @@
                 .Type<VersionGroupType>()
                 .Argument("nameOrId", a => a.Type<StringType>().Description("The identifier or name for the resource."))
                 .Resolver((ctx, token) => ctx.Service<GameResolver>().GetVersionGroupAsync(ctx.Argument<string>("nameOrId"), token));
+
+            descriptor.Field("location")
+                .Type<LocationType>()
+                .Argument("nameOrId", a => a.Type<StringType>().Description("The identifier or name for the resource."))
+                .Resolver((ctx, token) => ctx.Service<LocationResolver>().GetLocationAsync(ctx.Argument<string>("nameOrId"), token));
+            descriptor.Field("locationArea")
+                .Type<LocationAreaType>()
+                .Argument("id", a => a.Type<IntType>().Description("The identifier for the resource."))
+                .Resolver((ctx, token) => ctx.Service<LocationResolver>().GetLocationAreaAsync(ctx.Argument<int>("id"), token));
+            descriptor.Field("palParkArea")
+                .Type<PalParkAreaType>()
+                .Argument("nameOrId", a => a.Type<StringType>().Description("The identifier or name for the resource."))
+                .Resolver((ctx, token) => ctx.Service<LocationResolver>().GetPalParkAreaAsync(ctx.Argument<string>("nameOrId"), token));
+            descriptor.Field("region")
+                .Type<RegionType>()
+                .Argument("nameOrId", a => a.Type<StringType>().Description("The identifier or name for the resource."))
+                .Resolver((ctx, token) => ctx.Service<LocationResolver>().GetRegionAsync(ctx.Argument<string>("nameOrId"), token));
         }
     }
 }

@@ -4,6 +4,7 @@
     using System.Threading.Tasks;
     using HotChocolate.Types;
     using PokeAPI;
+    using PokeGraphQL.GraphQL.Resources.Locations;
 
     internal sealed class GenerationType : BaseNamedApiObjectType<Generation>
     {
@@ -18,7 +19,8 @@
                 .Ignore();
             descriptor.Field(x => x.MainRegion)
                 .Description("The main region travelled in this generation.")
-                .Ignore();
+                .Type<RegionType>()
+                .Resolver((ctx, token) => ctx.Service<LocationResolver>().GetRegionAsync(ctx.Parent<Generation>().MainRegion.Name, token));
             descriptor.Field(x => x.Moves)
                 .Description("A list of moves that were introduced in this generation.")
                 .Ignore();

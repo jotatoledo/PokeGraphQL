@@ -4,6 +4,7 @@
     using System.Threading.Tasks;
     using HotChocolate.Types;
     using PokeAPI;
+    using PokeGraphQL.GraphQL.Resources.Locations;
 
     internal sealed class PokedexType : BaseNamedApiObjectType<Pokedex>
     {
@@ -25,7 +26,8 @@
                 .Ignore();
             descriptor.Field(x => x.Region)
                 .Description("The region this pokédex catalogues pokémon for.")
-                .Ignore();
+                .Type<RegionType>()
+                .Resolver((ctx, token) => ctx.Service<LocationResolver>().GetRegionAsync(ctx.Parent<Pokedex>().Region.Name, token));
             descriptor.Field(x => x.VersionGroups)
                 .Description("A list of version groups this pokédex is relevent to.")
                 .Type<ListType<VersionGroupType>>()
