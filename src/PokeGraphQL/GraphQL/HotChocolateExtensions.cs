@@ -4,6 +4,7 @@
     using HotChocolate.Execution.Configuration;
     using HotChocolate.Utilities;
     using Microsoft.Extensions.DependencyInjection;
+    using PokeAPI;
     using PokeGraphQL.GraphQL.Converters;
     using PokeGraphQL.GraphQL.Resources.Berries;
     using PokeGraphQL.GraphQL.Resources.Contests;
@@ -11,7 +12,9 @@
     using PokeGraphQL.GraphQL.Resources.Games;
     using PokeGraphQL.GraphQL.Resources.Items;
     using PokeGraphQL.GraphQL.Resources.Locations;
+    using PokeGraphQL.GraphQL.Resources.Moves;
     using PokeGraphQL.GraphQL.Resources.Pokemons;
+    using static PokeGraphQL.GraphQL.Resources.Moves.MoveType;
 
     internal static class HotChocolateExtensions
     {
@@ -24,11 +27,14 @@
             services.AddScoped<GameResolver>();
             services.AddScoped<LocationResolver>();
             services.AddScoped<PokemonResolver>();
+            services.AddScoped<MoveResolver>();
 
             services.AddGraphQL(
                 sp => SchemaBuilder.New()
               .AddServices(sp)
               .AddQueryType<PokeApiQuery>()
+              //.BindClrType<MoveMetadata, MoveMetaDataType>()
+              //.AddType<MoveMetaDataType>()
               .Create(),
                 new QueryExecutionOptions
                 {

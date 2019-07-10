@@ -1,5 +1,6 @@
 ﻿namespace PokeGraphQL.GraphQL
 {
+    using System;
     using HotChocolate.Types;
     using PokeGraphQL.GraphQL.Resources.Berries;
     using PokeGraphQL.GraphQL.Resources.Contests;
@@ -7,6 +8,7 @@
     using PokeGraphQL.GraphQL.Resources.Games;
     using PokeGraphQL.GraphQL.Resources.Items;
     using PokeGraphQL.GraphQL.Resources.Locations;
+    using PokeGraphQL.GraphQL.Resources.Moves;
     using PokeGraphQL.GraphQL.Resources.Pokemons;
 
     public sealed class PokeApiQuery : ObjectType
@@ -23,6 +25,7 @@
             RegisterGameResources(descriptor);
             RegisterLocationResources(descriptor);
             RegisterPokemonResources(descriptor);
+            RegisterMoveResources(descriptor);
         }
 
         private static void RegisterBerryResources(IObjectTypeDescriptor descriptor)
@@ -159,6 +162,14 @@
                 .Type<PokemonType>()
                 .Argument("nameOrId", a => a.Type<StringType>().Description("The identifier or name for the resource."))
                 .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetPokemonAsync(ctx.Argument<string>("nameOrId"), token));
+        }
+
+        private void RegisterMoveResources(IObjectTypeDescriptor descriptor)
+        {
+            descriptor.Field("move")
+                .Type<MoveType>()
+                .Argument("nameOrId", a => a.Type<StringType>().Description("The identifier or name for the resource."))
+                .Resolver((ctx, token) => ctx.Service<MoveResolver>().GetMoveAsync(ctx.Argument<string>("nameOrId"), token));
         }
     }
 }

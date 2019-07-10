@@ -5,6 +5,7 @@
     using HotChocolate.Types;
     using PokeAPI;
     using PokeGraphQL.GraphQL.Resources.Locations;
+    using PokeGraphQL.GraphQL.Resources.Moves;
     using PokeGraphQL.GraphQL.Resources.Pokemons;
 
     internal sealed class GenerationType : BaseNamedApiObjectType<Generation>
@@ -32,7 +33,15 @@
                 .Resolver((ctx, token) => ctx.Service<LocationResolver>().GetRegionAsync(ctx.Parent<Generation>().MainRegion.Name, token));
             descriptor.Field(x => x.Moves)
                 .Description("A list of moves that were introduced in this generation.")
-                .Ignore();
+                .Type<ListType<MoveType>>()
+                .Resolver(async (ctx, token) =>
+                {
+                    var resolver = ctx.Service<MoveResolver>();
+                    var resourceTasks = ctx.Parent<Generation>()
+                        .Moves
+                        .Select(move => resolver.GetMoveAsync(move.Name, token));
+                    return await Task.WhenAll(resourceTasks);
+                });
             descriptor.Field(x => x.Species)
                 .Name("pokemonSpecies")
                 .Description("A list of pokémon species that were introduced in this generation.")

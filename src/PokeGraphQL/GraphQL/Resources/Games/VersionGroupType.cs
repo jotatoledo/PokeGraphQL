@@ -5,6 +5,7 @@
     using HotChocolate.Types;
     using PokeAPI;
     using PokeGraphQL.GraphQL.Resources.Locations;
+    using PokeGraphQL.GraphQL.Resources.Moves;
 
     internal sealed class VersionGroupType : BaseNamedApiObjectType<VersionGroup>
     {
@@ -21,7 +22,15 @@
                 .Resolver((ctx, token) => ctx.Service<GameResolver>().GetGenerationAsync(ctx.Parent<VersionGroup>().Generation.Name, token));
             descriptor.Field(x => x.MoveLearnMethods)
                 .Description("A list of methods in which pokemon can learn moves in this version group.")
-                .Ignore();
+                .Type<ListType<MoveLearnMethodType>>()
+                .Resolver(async (ctx, token) =>
+                {
+                    var resolver = ctx.Service<MoveResolver>();
+                    var resourceTasks = ctx.Parent<VersionGroup>()
+                        .MoveLearnMethods
+                        .Select(learnMethod => resolver.GetMoveLearnMethodAsync(learnMethod.Name, token));
+                    return await Task.WhenAll(resourceTasks);
+                });
             descriptor.Field(x => x.Pokedices)
                 .Name("pokedexes")
                 .Description("A list of pokedexes introduced in this version group.")
