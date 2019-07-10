@@ -7,6 +7,7 @@
     using PokeGraphQL.GraphQL.Resources.Games;
     using PokeGraphQL.GraphQL.Resources.Items;
     using PokeGraphQL.GraphQL.Resources.Locations;
+    using PokeGraphQL.GraphQL.Resources.Pokemons;
 
     public sealed class PokeApiQuery : ObjectType
     {
@@ -15,7 +16,17 @@
         {
             descriptor.Name("Query")
                 .Description("All the Pokémon data you'll ever need in one place, easily accessible through a modern GraphQL API.");
+            RegisterBerryResources(descriptor);
+            RegisterItemResources(descriptor);
+            RegisterContestResources(descriptor);
+            RegisterEncounterResources(descriptor);
+            RegisterGameResources(descriptor);
+            RegisterLocationResources(descriptor);
+            RegisterPokemonResources(descriptor);
+        }
 
+        private static void RegisterBerryResources(IObjectTypeDescriptor descriptor)
+        {
             descriptor.Field("berry")
                 .Type<BerryType>()
                 .Argument("nameOrId", a => a.Type<StringType>().Description("The identifier or name for the resource."))
@@ -28,7 +39,10 @@
                 .Type<BerryFlavorType>()
                 .Argument("nameOrId", a => a.Type<StringType>().Description("The identifier or name for the resource."))
                 .Resolver((ctx, token) => ctx.Service<BerryResolver>().GetBerryFlavorAsync(ctx.Argument<string>("nameOrId"), token));
+        }
 
+        private static void RegisterItemResources(IObjectTypeDescriptor descriptor)
+        {
             descriptor.Field("item")
                 .Type<ItemType>()
                 .Argument("nameOrId", a => a.Type<StringType>().Description("The identifier or name for the resource."))
@@ -49,7 +63,10 @@
                 .Type<ItemFlingEffectType>()
                 .Argument("nameOrId", a => a.Type<StringType>().Description("The identifier or name for the resource."))
                 .Resolver((ctx, token) => ctx.Service<ItemResolver>().GetFlingEffectAsync(ctx.Argument<string>("nameOrId"), token));
+        }
 
+        private static void RegisterContestResources(IObjectTypeDescriptor descriptor)
+        {
             descriptor.Field("contestType")
                 .Type<ContestTypeType>()
                 .Argument("nameOrId", a => a.Type<StringType>().Description("The identifier or name for the resource."))
@@ -62,7 +79,10 @@
                 .Type<SuperContestEffectType>()
                 .Argument("id", a => a.Type<IntType>().Description("The identifier for the resource."))
                 .Resolver((ctx, token) => ctx.Service<ContestResolver>().GetSuperContestEffectAsync(ctx.Argument<int>("id"), token));
+        }
 
+        private static void RegisterEncounterResources(IObjectTypeDescriptor descriptor)
+        {
             descriptor.Field("encounterMethod")
                 .Type<EncounterMethodType>()
                 .Argument("nameOrId", a => a.Type<StringType>().Description("The identifier or name for the resource."))
@@ -75,7 +95,10 @@
                 .Type<EncounterConditionValueType>()
                 .Argument("nameOrId", a => a.Type<StringType>().Description("The identifier or name for the resource."))
                 .Resolver((ctx, token) => ctx.Service<EncounterResolver>().GetEncounterConditionValueAsync(ctx.Argument<string>("nameOrId"), token));
+        }
 
+        private static void RegisterGameResources(IObjectTypeDescriptor descriptor)
+        {
             descriptor.Field("generation")
                 .Type<GenerationType>()
                 .Argument("nameOrId", a => a.Type<StringType>().Description("The identifier or name for the resource."))
@@ -92,7 +115,10 @@
                 .Type<VersionGroupType>()
                 .Argument("nameOrId", a => a.Type<StringType>().Description("The identifier or name for the resource."))
                 .Resolver((ctx, token) => ctx.Service<GameResolver>().GetVersionGroupAsync(ctx.Argument<string>("nameOrId"), token));
+        }
 
+        private static void RegisterLocationResources(IObjectTypeDescriptor descriptor)
+        {
             descriptor.Field("location")
                 .Type<LocationType>()
                 .Argument("nameOrId", a => a.Type<StringType>().Description("The identifier or name for the resource."))
@@ -109,6 +135,30 @@
                 .Type<RegionType>()
                 .Argument("nameOrId", a => a.Type<StringType>().Description("The identifier or name for the resource."))
                 .Resolver((ctx, token) => ctx.Service<LocationResolver>().GetRegionAsync(ctx.Argument<string>("nameOrId"), token));
+        }
+
+        private static void RegisterPokemonResources(IObjectTypeDescriptor descriptor)
+        {
+            descriptor.Field("ability")
+                .Type<AbilityType>()
+                .Argument("nameOrId", a => a.Type<StringType>().Description("The identifier or name for the resource."))
+                .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetAbilityAsync(ctx.Argument<string>("nameOrId"), token));
+            descriptor.Field("characteristic")
+                .Type<CharacteristicType>()
+                .Argument("id", a => a.Type<StringType>().Description("The identifier for the resource."))
+                .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetCharacteristicAsync(ctx.Argument<int>("id"), token));
+            descriptor.Field("eggGroup")
+                .Type<EggGroupType>()
+                .Argument("nameOrId", a => a.Type<StringType>().Description("The identifier or name for the resource."))
+                .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetEggGroupAsync(ctx.Argument<string>("nameOrId"), token));
+            descriptor.Field("gender")
+                .Type<GenderType>()
+                .Argument("nameOrId", a => a.Type<StringType>().Description("The identifier or name for the resource."))
+                .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetGenderAsync(ctx.Argument<string>("nameOrId"), token));
+            descriptor.Field("pokemon")
+                .Type<PokemonType>()
+                .Argument("nameOrId", a => a.Type<StringType>().Description("The identifier or name for the resource."))
+                .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetPokemonAsync(ctx.Argument<string>("nameOrId"), token));
         }
     }
 }

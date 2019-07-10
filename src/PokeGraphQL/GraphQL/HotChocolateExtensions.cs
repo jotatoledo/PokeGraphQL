@@ -11,6 +11,7 @@
     using PokeGraphQL.GraphQL.Resources.Games;
     using PokeGraphQL.GraphQL.Resources.Items;
     using PokeGraphQL.GraphQL.Resources.Locations;
+    using PokeGraphQL.GraphQL.Resources.Pokemons;
 
     internal static class HotChocolateExtensions
     {
@@ -22,6 +23,7 @@
             services.AddScoped<EncounterResolver>();
             services.AddScoped<GameResolver>();
             services.AddScoped<LocationResolver>();
+            services.AddScoped<PokemonResolver>();
 
             services.AddGraphQL(
                 sp => SchemaBuilder.New()
