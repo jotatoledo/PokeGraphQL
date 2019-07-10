@@ -1,8 +1,6 @@
 ﻿namespace PokeGraphQL
 {
     using HotChocolate.AspNetCore;
-    using HotChocolate.AspNetCore.GraphiQL;
-    using HotChocolate.AspNetCore.Playground;
     using HotChocolate.AspNetCore.Voyager;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;

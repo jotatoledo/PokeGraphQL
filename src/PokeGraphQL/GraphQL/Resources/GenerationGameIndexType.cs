@@ -6,6 +6,7 @@
 
     internal sealed class GenerationGameIndexType : ObjectType<GenerationGameIndex>
     {
+        /// <inheritdoc/>
         protected override void Configure(IObjectTypeDescriptor<GenerationGameIndex> descriptor)
         {
             descriptor.FixStructType();

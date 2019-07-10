@@ -1,6 +1,5 @@
 ﻿namespace PokeGraphQL.GraphQL.Resources.Contests
 {
-    using System;
     using System.Threading;
     using System.Threading.Tasks;
     using PokeAPI;

@@ -19,7 +19,9 @@
                 .Resolver(async (ctx, token) =>
                 {
                     var resolver = ctx.Service<ItemResolver>();
-                    var resourceTasks = ctx.Parent<ItemFlingEffect>().Items.Select(item => resolver.GetItemAsync(item.Name, token));
+                    var resourceTasks = ctx.Parent<ItemFlingEffect>()
+                        .Items
+                        .Select(item => resolver.GetItemAsync(item.Name, token));
                     return await Task.WhenAll(resourceTasks);
                 });
         }
