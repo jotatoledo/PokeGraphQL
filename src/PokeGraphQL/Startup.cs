@@ -7,21 +7,27 @@
 
 namespace PokeGraphQL
 {
+    using System;
     using HotChocolate.AspNetCore;
+    using HotChocolate.AspNetCore.GraphiQL;
     using HotChocolate.AspNetCore.Voyager;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
-    using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.HttpOverrides;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Logging;
     using PokeGraphQL.GraphQL;
 
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private readonly ILogger logger;
+
+        public Startup(IConfiguration configuration, ILoggerFactory loggerFactory)
         {
             this.Configuration = configuration;
+            this.logger = loggerFactory.CreateLogger("Heroku");
         }
 
         public IConfiguration Configuration { get; }
@@ -31,28 +37,55 @@ namespace PokeGraphQL
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddHotChocolate();
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            if (string.Equals(this.Configuration.GetValue<string>("ASPNETCORE_FORWARDEDHEADERS_ENABLED"), "true", StringComparison.OrdinalIgnoreCase))
+            {
+                services.Configure<ForwardedHeadersOptions>(options =>
+                {
+                    options.ForwardLimit = 2;
+                    options.ForwardedHeaders =
+                        ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+
+                    // Only loopback proxies are allowed by default.
+                    // Clear that restriction because forwarders are enabled by explicit configuration.
+                    options.KnownProxies.Clear();
+                    options.KnownNetworks.Clear();
+
+                    var webHost = this.Configuration.GetValue<string>("ASPNETCORE_WEBHOST");
+                    if (!string.IsNullOrEmpty(webHost))
+                    {
+                        options.AllowedHosts.Add(webHost);
+                    }
+                });
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            if (string.Equals(this.Configuration.GetValue<string>("ASPNETCORE_FORWARDEDHEADERS_ENABLED"), "true", StringComparison.OrdinalIgnoreCase))
+            {
+                app.UseForwardedHeaders();
+            }
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
             else
             {
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseHttpsRedirection();
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
-
             app.UseGraphQL("/graphql")
-                .UseGraphiQL("/graphql", "/graphiql")
-                .UsePlayground("/graphql", "/playground" )
-                .UseVoyager("/graphql", "/voyager" );
+                .UseGraphiQL(new GraphiQLOptions
+                {
+                    EnableSubscription = false,
+                    QueryPath = "/graphql",
+                    Path = "/graphiql",
+                })
+                .UsePlayground("/graphql", "/playground")
+                .UseVoyager("/graphql", "/voyager");
             app.UseMvc();
         }
     }
