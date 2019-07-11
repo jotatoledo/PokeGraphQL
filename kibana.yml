@@ -1,3 +1,0 @@
-server.name: localhost
-server.host: "0"
-elasticsearch.hosts: http://pokedex_es:9200

@@ -30,7 +30,6 @@ namespace PokeGraphQL
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            services.AddElasticsearch(this.Configuration);
             services.AddHotChocolate();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         }

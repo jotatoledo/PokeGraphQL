@@ -1,2 +1,0 @@
-discovery.type: "single-node"
-network.host: [ _local_, _site_ ]

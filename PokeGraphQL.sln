@@ -5,9 +5,6 @@ VisualStudioVersion = 15.0.28307.705
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F926AEF4-06F9-448E-93B9-45DC5D0D47AF}"
 	ProjectSection(SolutionItems) = preProject
-		docker-compose.yml = docker-compose.yml
-		elasticsearch.yml = elasticsearch.yml
-		kibana.yml = kibana.yml
 		LICENSE = LICENSE
 		stylecop.json = stylecop.json
 	EndProjectSection
