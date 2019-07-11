@@ -1,4 +1,11 @@
-﻿namespace PokeGraphQL.GraphQL.Resources.Contests
+﻿// <copyright file="ContestType.cs" company="PokeGraphQL.Net">
+// Copyright (c) PokeGraphQL.Net. All rights reserved.
+//
+// Licensed under the MIT license.
+// See LICENSE file in the project root for full license information.
+// </copyright>
+
+namespace PokeGraphQL.GraphQL.Resources.Contests
 {
     using HotChocolate.Types;
     using PokeAPI;
