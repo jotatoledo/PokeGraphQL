@@ -7,6 +7,7 @@
 
 namespace PokeGraphQL.GraphQL
 {
+    using System;
     using HotChocolate.Types;
     using PokeGraphQL.GraphQL.Resources.Berries;
     using PokeGraphQL.GraphQL.Resources.Contests;
@@ -14,6 +15,7 @@ namespace PokeGraphQL.GraphQL
     using PokeGraphQL.GraphQL.Resources.Evolutions;
     using PokeGraphQL.GraphQL.Resources.Games;
     using PokeGraphQL.GraphQL.Resources.Items;
+    using PokeGraphQL.GraphQL.Resources.Languages;
     using PokeGraphQL.GraphQL.Resources.Locations;
     using PokeGraphQL.GraphQL.Resources.Moves;
     using PokeGraphQL.GraphQL.Resources.Pokemons;
@@ -34,6 +36,15 @@ namespace PokeGraphQL.GraphQL
             RegisterPokemonResources(descriptor);
             RegisterMoveResources(descriptor);
             RegisterEvolutionResources(descriptor);
+            RegisterLanguageResources(descriptor);
+        }
+
+        private static void RegisterLanguageResources(IObjectTypeDescriptor descriptor)
+        {
+            descriptor.Field("berry")
+                .Type<LanguageType>()
+                .Argument("nameOrId", a => a.Type<StringType>().Description("The identifier or name for the resource."))
+                .Resolver((ctx, token) => ctx.Service<LanguageResolver>().GetLanguageAsync(ctx.Argument<string>("nameOrId"), token));
         }
 
         private static void RegisterEvolutionResources(IObjectTypeDescriptor descriptor)
