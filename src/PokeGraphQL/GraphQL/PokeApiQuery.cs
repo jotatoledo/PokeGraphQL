@@ -7,7 +7,6 @@
 
 namespace PokeGraphQL.GraphQL
 {
-    using System;
     using HotChocolate.Types;
     using PokeGraphQL.GraphQL.Resources.Berries;
     using PokeGraphQL.GraphQL.Resources.Contests;

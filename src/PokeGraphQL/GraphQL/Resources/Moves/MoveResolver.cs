@@ -7,7 +7,6 @@
 
 namespace PokeGraphQL.GraphQL.Resources.Moves
 {
-    using System;
     using System.Threading;
     using System.Threading.Tasks;
     using PokeAPI;

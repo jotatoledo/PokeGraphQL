@@ -11,7 +11,6 @@ namespace PokeGraphQL.GraphQL
     using HotChocolate.Execution.Configuration;
     using HotChocolate.Utilities;
     using Microsoft.Extensions.DependencyInjection;
-    using PokeAPI;
     using PokeGraphQL.GraphQL.Converters;
     using PokeGraphQL.GraphQL.Resources.Berries;
     using PokeGraphQL.GraphQL.Resources.Contests;
@@ -21,7 +20,6 @@ namespace PokeGraphQL.GraphQL
     using PokeGraphQL.GraphQL.Resources.Locations;
     using PokeGraphQL.GraphQL.Resources.Moves;
     using PokeGraphQL.GraphQL.Resources.Pokemons;
-    using static PokeGraphQL.GraphQL.Resources.Moves.MoveType;
 
     internal static class HotChocolateExtensions
     {
@@ -40,12 +38,10 @@ namespace PokeGraphQL.GraphQL
                 sp => SchemaBuilder.New()
               .AddServices(sp)
               .AddQueryType<PokeApiQuery>()
-              //.BindClrType<MoveMetadata, MoveMetaDataType>()
-              //.AddType<MoveMetaDataType>()
               .Create(),
                 new QueryExecutionOptions
                 {
-                    TracingPreference = TracingPreference.OnDemand
+                    TracingPreference = TracingPreference.OnDemand,
                 });
 
             services.AddConversion();
