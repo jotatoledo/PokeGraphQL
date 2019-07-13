@@ -16,11 +16,17 @@ namespace PokeGraphQL.GraphQL.Resources
     {
         private static readonly string Pattern = "(.+?)([A-Z])";
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BaseApiObjectType{TType}"/> class.
+        /// </summary>
         public BaseApiObjectType()
         {
             this.ResourceName = this.CamelCaseSplit(typeof(TType).Name);
         }
 
+        /// <summary>
+        /// Gets or sets the resource name.
+        /// </summary>
         protected string ResourceName { get; set; }
 
         /// <inheritdoc/>
@@ -32,7 +38,13 @@ namespace PokeGraphQL.GraphQL.Resources
             this.ConcreteConfigure(descriptor);
         }
 
+        /// <summary>
+        /// Configures the graph type descriptor.
+        /// </summary>
+        /// <param name="descriptor">The graph type descriptor.</param>
         protected abstract void ConcreteConfigure(IObjectTypeDescriptor<TType> descriptor);
+
+        private static string Eval(Match match) => $"{match.Groups[1].Value.ToLower()} {match.Groups[2].Value.ToLower()}";
 
         private string CamelCaseSplit(string source)
         {
@@ -40,7 +52,5 @@ namespace PokeGraphQL.GraphQL.Resources
                 ? source.ToLower()
                 : Regex.Replace(source, Pattern, Eval);
         }
-
-        private static string Eval(Match match) => $"{match.Groups[1].Value.ToLower()} {match.Groups[2].Value.ToLower()}";
     }
 }

@@ -52,7 +52,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
             protected override void Configure(IObjectTypeDescriptor<StatAffectNature> descriptor)
             {
                 descriptor.FixStructType();
-                descriptor.Field(x=>x.Increase)
+                descriptor.Field(x => x.Increase)
                     .Description("A list of natures and how they change the referenced stat.")
                     .Type<ListType<NatureType>>()
                     .Resolver((ctx, token) =>

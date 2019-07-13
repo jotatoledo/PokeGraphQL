@@ -56,7 +56,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
                 });
         }
 
-        private sealed class TypeRelationsType: ObjectType<TypeRelations>
+        private sealed class TypeRelationsType : ObjectType<TypeRelations>
         {
             protected override void Configure(IObjectTypeDescriptor<TypeRelations> descriptor)
             {
