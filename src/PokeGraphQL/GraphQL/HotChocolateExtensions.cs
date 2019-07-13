@@ -15,6 +15,7 @@ namespace PokeGraphQL.GraphQL
     using PokeGraphQL.GraphQL.Resources.Berries;
     using PokeGraphQL.GraphQL.Resources.Contests;
     using PokeGraphQL.GraphQL.Resources.Encounters;
+    using PokeGraphQL.GraphQL.Resources.Evolutions;
     using PokeGraphQL.GraphQL.Resources.Games;
     using PokeGraphQL.GraphQL.Resources.Items;
     using PokeGraphQL.GraphQL.Resources.Locations;
@@ -33,6 +34,7 @@ namespace PokeGraphQL.GraphQL
             services.AddScoped<LocationResolver>();
             services.AddScoped<PokemonResolver>();
             services.AddScoped<MoveResolver>();
+            services.AddScoped<EvolutionResolver>();
 
             services.AddGraphQL(
                 sp => SchemaBuilder.New()

@@ -11,6 +11,7 @@ namespace PokeGraphQL.GraphQL
     using PokeGraphQL.GraphQL.Resources.Berries;
     using PokeGraphQL.GraphQL.Resources.Contests;
     using PokeGraphQL.GraphQL.Resources.Encounters;
+    using PokeGraphQL.GraphQL.Resources.Evolutions;
     using PokeGraphQL.GraphQL.Resources.Games;
     using PokeGraphQL.GraphQL.Resources.Items;
     using PokeGraphQL.GraphQL.Resources.Locations;
@@ -32,6 +33,15 @@ namespace PokeGraphQL.GraphQL
             RegisterLocationResources(descriptor);
             RegisterPokemonResources(descriptor);
             RegisterMoveResources(descriptor);
+            RegisterEvolutionResources(descriptor);
+        }
+
+        private static void RegisterEvolutionResources(IObjectTypeDescriptor descriptor)
+        {
+            descriptor.Field("evolutionChain")
+                .Type<SuperContestEffectType>()
+                .Argument("id", a => a.Type<IntType>().Description("The identifier for the resource."))
+                .Resolver((ctx, token) => ctx.Service<EvolutionResolver>().GetEvolutionChainAsync(ctx.Argument<int>("id"), token));
         }
 
         private static void RegisterBerryResources(IObjectTypeDescriptor descriptor)
@@ -170,7 +180,7 @@ namespace PokeGraphQL.GraphQL
                 .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetPokemonAsync(ctx.Argument<string>("nameOrId"), token));
         }
 
-        private void RegisterMoveResources(IObjectTypeDescriptor descriptor)
+        private static void RegisterMoveResources(IObjectTypeDescriptor descriptor)
         {
             descriptor.Field("move")
                 .Type<MoveType>()

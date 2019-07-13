@@ -7,10 +7,12 @@
 
 namespace PokeGraphQL.GraphQL.Resources.Pokemons
 {
+    using System;
     using System.Linq;
     using System.Threading.Tasks;
     using HotChocolate.Types;
     using PokeAPI;
+    using PokeGraphQL.GraphQL.Resources.Evolutions;
     using PokeGraphQL.GraphQL.Resources.Games;
     using PokeGraphQL.GraphQL.Resources.Locations;
 
@@ -53,13 +55,13 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
             descriptor.Field(x => x.EggGroups)
                 .Description("A list of egg groups this pokémon species is a member of.")
                 .Type<ListType<EggGroupType>>()
-                .Resolver(async (ctx, token) =>
+                .Resolver((ctx, token) =>
                 {
                     var resolver = ctx.Service<PokemonResolver>();
                     var resourceTasks = ctx.Parent<PokemonSpecies>()
                         .EggGroups
                         .Select(eggGroup => resolver.GetEggGroupAsync(eggGroup.Name, token));
-                    return await Task.WhenAll(resourceTasks);
+                    return Task.WhenAll(resourceTasks);
                 });
             descriptor.Field(x => x.Colours)
                 .Description("The color of this pokémon for gimmicky pokedex search.")
@@ -75,7 +77,8 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
                 .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetPokemonSpeciesAsync(ctx.Parent<PokemonSpecies>().EvolvesFromSpecies.Name, token));
             descriptor.Field(x => x.EvolutionChain)
                 .Description("The evolution chain this pokémon species is a member of.")
-                .Ignore();
+                .Type<EvolutionChainType>()
+                .Resolver((ctx, token) => ctx.Service<EvolutionResolver>().GetEvolutionChainAsync(Convert.ToInt32(ctx.Parent<PokemonSpecies>().EvolutionChain.Url.LastSegment()), token));
             descriptor.Field(x => x.Habitat)
                 .Description("The habitat this pokémon species can be encountered in.")
                 .Type<PokemonHabitatType>()
