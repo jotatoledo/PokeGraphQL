@@ -13,7 +13,6 @@ namespace PokeGraphQL
     using HotChocolate.AspNetCore.Voyager;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
-    using Microsoft.AspNetCore.HttpOverrides;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -37,25 +36,15 @@ namespace PokeGraphQL
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddHotChocolate();
+
+            if (string.Equals(this.Configuration.GetValue<string>("ASPNETCORE_HSTS_ENABLED"), "true", StringComparison.OrdinalIgnoreCase))
+            {
+                services.ConfigureOptions<ConfigureHsts>();
+            }
+
             if (string.Equals(this.Configuration.GetValue<string>("ASPNETCORE_FORWARDEDHEADERS_ENABLED"), "true", StringComparison.OrdinalIgnoreCase))
             {
-                services.Configure<ForwardedHeadersOptions>(options =>
-                {
-                    options.ForwardLimit = 2;
-                    options.ForwardedHeaders =
-                        ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-
-                    // Only loopback proxies are allowed by default.
-                    // Clear that restriction because forwarders are enabled by explicit configuration.
-                    options.KnownProxies.Clear();
-                    options.KnownNetworks.Clear();
-
-                    var webHost = this.Configuration.GetValue<string>("ASPNETCORE_WEBHOST");
-                    if (!string.IsNullOrEmpty(webHost))
-                    {
-                        options.AllowedHosts.Add(webHost);
-                    }
-                });
+                services.ConfigureOptions<ConfigureForwardedHeaders>();
             }
         }
 
@@ -74,7 +63,10 @@ namespace PokeGraphQL
             else
             {
                 app.UseHttpsRedirection();
-                app.UseHsts();
+                if (string.Equals(this.Configuration.GetValue<string>("ASPNETCORE_HSTS_ENABLED"), "true", StringComparison.OrdinalIgnoreCase))
+                {
+                    app.UseHsts();
+                }
             }
 
             app.UseGraphQL("/graphql")
