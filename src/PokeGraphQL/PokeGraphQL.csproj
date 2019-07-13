@@ -1,10 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
+    <Authors>José Toledo Navarro</Authors>
+    <Summary>All the Pokémon data you'll ever need in one place, easily accessible through a modern GraphQL API.</Summary>
+    <Description>All the Pokémon data you'll ever need in one place, easily accessible through a modern GraphQL API.</Description>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <LangVersion>latest</LangVersion>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <UserSecretsId>9ce5f362-f0c2-40e8-91c3-cf7b50197bc2</UserSecretsId>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/jotatoledo/PokeGraphQL</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
