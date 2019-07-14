@@ -2,7 +2,22 @@
 
 All the Pokémon data you'll ever need in one place, easily accessible through a modern GraphQL API.
 
-The GraphQL API is possible thanks to the awesome [HotChocolate](https://github.com/ChilliCream/hotchocolate) project.
+> The GraphQL API is possible thanks to the awesome [HotChocolate project](https://github.com/ChilliCream/hotchocolate).
+
+> The RESTful API provided by the awesome [PokeAPI project](https://github.com/PokeAPI/pokeapi) is consumed through the [PokeApi.Net project](https://gitlab.com/PoroCYon/PokeApi.NET).
+
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/jotatoledo/PokeGraphQL/tree/master)
+
+## Docker
+
+The application is dockerized. To build and run the image execute the following in the solution folder:
+
+```bash
+docker build -t <image_name>
+docker run -d -p 8080:80 --name <container_name> <image_name>
+```
+
+After that the application should be reachable at http://localhost:8080
 
 ## Cloud deployment
 
@@ -38,11 +53,20 @@ After loging in create a new app by running:
 heroku create --name <heroku_app>
 ```
 
-After the application is created, you need to set the buildpack of it to one compatible
-with `dotnetcore`. The one used in this deployment can be found [here](https://github.com/jincod/dotnetcore-buildpack).
+After the application is created, you need to set some [config vars](https://devcenter.heroku.com/articles/config-vars) 
+and add a [buildpack](https://devcenter.heroku.com/articles/buildpacks) compatible with `dotnetcore`. 
 
-You can add a buildpack as follows:
+The buildpack used in this deployment can be found [here](https://github.com/jincod/dotnetcore-buildpack).
+You can add it as follows:
 
 ```bash
 heroku buildpacks:set jincod/dotnetcore -a <heroku_app>
+```
+
+Through the use of config vars we will set some of the env. variables mentioned in the [cloud deployment](#cloud-deployment) section.
+This can be done as follows:
+
+```bash
+heroku config:set ASPNETCORE_FORWARDEDHEADERS_ENABLED=true -a <heroku_app>
+heroku config:set ASPNETCORE_HSTS_ENABLED=true -a <heroku_app>
 ```
