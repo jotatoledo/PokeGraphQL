@@ -21,11 +21,11 @@ namespace PokeGraphQL.GraphQL.Resources.Items
             descriptor.Field(x => x.Categories)
                 .Description("A list of item categories that are relevent to this item pocket.")
                 .Type<ListType<ItemCategoryType>>()
-                .Resolver(async (ctx, token) =>
+                .Resolver((ctx, token) =>
                 {
                     var resolver = ctx.Service<ItemResolver>();
                     var resourceTasks = ctx.Parent<ItemPocket>().Categories.Select(category => resolver.GetCategoryAsync(category.Name, token));
-                    return await Task.WhenAll(resourceTasks);
+                    return Task.WhenAll(resourceTasks);
                 });
         }
     }

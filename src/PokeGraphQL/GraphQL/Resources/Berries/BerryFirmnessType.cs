@@ -19,11 +19,13 @@ namespace PokeGraphQL.GraphQL.Resources.Berries
         {
             descriptor.Field(x => x.Berries)
                 .Type<ListType<BerryType>>()
-                .Resolver(async (ctx, token) =>
+                .Resolver((ctx, token) =>
                 {
                     var service = ctx.Service<BerryResolver>();
-                    var resourceTasks = ctx.Parent<BerryFirmness>().Berries.Select(berry => service.GetBerryAsync(berry.Name, token));
-                    return await Task.WhenAll(resourceTasks);
+                    var resourceTasks = ctx.Parent<BerryFirmness>()
+                        .Berries
+                        .Select(berry => service.GetBerryAsync(berry.Name, token));
+                    return Task.WhenAll(resourceTasks);
                 });
         }
     }

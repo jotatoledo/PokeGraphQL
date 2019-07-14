@@ -22,13 +22,13 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
             descriptor.Field(x => x.Species)
                 .Description("A list of the pokémon species that can be found in this habitat.")
                 .Type<ListType<PokemonSpeciesType>>()
-                .Resolver(async (ctx, token) =>
+                .Resolver((ctx, token) =>
                 {
                     var resolver = ctx.Service<PokemonResolver>();
                     var resourceTasks = ctx.Parent<PokemonHabitat>()
                         .Species
                         .Select(species => resolver.GetPokemonSpeciesAsync(species.Name, token));
-                    return await Task.WhenAll(resourceTasks);
+                    return Task.WhenAll(resourceTasks);
                 });
         }
     }

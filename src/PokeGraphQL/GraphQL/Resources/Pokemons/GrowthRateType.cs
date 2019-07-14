@@ -28,13 +28,13 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
             descriptor.Field(x => x.Species)
                 .Description("	A list of pokémon species that gain levels at this growth rate.")
                 .Type<ListType<PokemonSpeciesType>>()
-                .Resolver(async (ctx, token) =>
+                .Resolver((ctx, token) =>
                 {
                     var resolver = ctx.Service<PokemonResolver>();
                     var resourceTasks = ctx.Parent<GrowthRate>()
                         .Species
                         .Select(species => resolver.GetPokemonSpeciesAsync(species.Name, token));
-                    return await Task.WhenAll(resourceTasks);
+                    return Task.WhenAll(resourceTasks);
                 });
         }
 

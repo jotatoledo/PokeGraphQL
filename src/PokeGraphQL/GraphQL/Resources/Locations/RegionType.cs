@@ -23,13 +23,13 @@ namespace PokeGraphQL.GraphQL.Resources.Locations
             descriptor.Field(x => x.Locations)
                 .Description("A list of locations that can be found in this region.")
                 .Type<ListType<LocationType>>()
-                .Resolver(async (ctx, token) =>
+                .Resolver((ctx, token) =>
                 {
                     var resolver = ctx.Service<LocationResolver>();
                     var resourceTasks = ctx.Parent<Region>()
                         .Locations
                         .Select(location => resolver.GetLocationAsync(location.Name, token));
-                    return await Task.WhenAll(resourceTasks);
+                    return Task.WhenAll(resourceTasks);
                 });
             descriptor.Field(x => x.MainGeneration)
                 .Description("The generation this region was introduced in.")
@@ -39,24 +39,24 @@ namespace PokeGraphQL.GraphQL.Resources.Locations
                 .Name("pokedexes")
                 .Description("A list of pokédexes that catalogue pokemon in this region.")
                 .Type<ListType<PokedexType>>()
-                .Resolver(async (ctx, token) =>
+                .Resolver((ctx, token) =>
                 {
                     var resolver = ctx.Service<GameResolver>();
                     var resourceTasks = ctx.Parent<Region>()
                         .Pokedices
                         .Select(pokedex => resolver.GetPokedexAsync(pokedex.Name, token));
-                    return await Task.WhenAll(resourceTasks);
+                    return Task.WhenAll(resourceTasks);
                 });
             descriptor.Field(x => x.VersionGroups)
                 .Description("A list of version groups where this region can be visited.")
                 .Type<ListType<VersionGroupType>>()
-                .Resolver(async (ctx, token) =>
+                .Resolver((ctx, token) =>
                 {
                     var resolver = ctx.Service<GameResolver>();
                     var resourceTasks = ctx.Parent<Region>()
                         .VersionGroups
                         .Select(versionGroup => resolver.GetVersionGroupAsync(versionGroup.Name, token));
-                    return await Task.WhenAll(resourceTasks);
+                    return Task.WhenAll(resourceTasks);
                 });
         }
     }

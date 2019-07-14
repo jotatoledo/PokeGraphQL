@@ -22,13 +22,13 @@ namespace PokeGraphQL.GraphQL.Resources.Moves
             descriptor.Field(x => x.Moves)
                 .Description("A list of moves that fall into this damage class.")
                 .Type<ListType<MoveType>>()
-                .Resolver(async (ctx, token) =>
+                .Resolver((ctx, token) =>
                 {
                     var resolver = ctx.Service<MoveResolver>();
                     var resourceTasks = ctx.Parent<MoveDamageClass>()
                         .Moves
                         .Select(move => resolver.GetMoveAsync(move.Name, token));
-                    return await Task.WhenAll(resourceTasks);
+                    return Task.WhenAll(resourceTasks);
                 });
         }
     }
