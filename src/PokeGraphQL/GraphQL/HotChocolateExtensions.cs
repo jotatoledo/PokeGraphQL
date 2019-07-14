@@ -21,6 +21,7 @@ namespace PokeGraphQL.GraphQL
     using PokeGraphQL.GraphQL.Resources.Items;
     using PokeGraphQL.GraphQL.Resources.Languages;
     using PokeGraphQL.GraphQL.Resources.Locations;
+    using PokeGraphQL.GraphQL.Resources.Machines;
     using PokeGraphQL.GraphQL.Resources.Moves;
     using PokeGraphQL.GraphQL.Resources.Pokemons;
 
@@ -39,6 +40,7 @@ namespace PokeGraphQL.GraphQL
             services.AddScoped<EvolutionResolver>();
             services.AddScoped<LanguageResolver>();
             services.AddScoped<UrlResolver>();
+            services.AddScoped<MachineResolver>();
 
             services.AddGraphQL(
                 sp => SchemaBuilder.New()

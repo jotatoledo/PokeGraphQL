@@ -7,7 +7,6 @@
 
 namespace PokeGraphQL.GraphQL
 {
-    using System;
     using HotChocolate.Types;
     using PokeGraphQL.GraphQL.Resources.Berries;
     using PokeGraphQL.GraphQL.Resources.Contests;
@@ -17,6 +16,7 @@ namespace PokeGraphQL.GraphQL
     using PokeGraphQL.GraphQL.Resources.Items;
     using PokeGraphQL.GraphQL.Resources.Languages;
     using PokeGraphQL.GraphQL.Resources.Locations;
+    using PokeGraphQL.GraphQL.Resources.Machines;
     using PokeGraphQL.GraphQL.Resources.Moves;
     using PokeGraphQL.GraphQL.Resources.Pokemons;
 
@@ -37,6 +37,15 @@ namespace PokeGraphQL.GraphQL
             RegisterMoveResources(descriptor);
             RegisterEvolutionResources(descriptor);
             RegisterLanguageResources(descriptor);
+            RegisterMachineResources(descriptor);
+        }
+
+        private static void RegisterMachineResources(IObjectTypeDescriptor descriptor)
+        {
+            descriptor.Field("machine")
+                .Type<MachineType>()
+                .Argument("id", a => a.Type<IntType>().Description("The identifier for the resource."))
+                .Resolver((ctx, token) => ctx.Service<MachineResolver>().GetMachineAsync(ctx.Argument<int>("id"), token));
         }
 
         private static void RegisterLanguageResources(IObjectTypeDescriptor descriptor)
