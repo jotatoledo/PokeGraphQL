@@ -19,7 +19,8 @@ namespace PokeGraphQL
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseDefaultServiceProvider((context, options) => {
+                .UseDefaultServiceProvider((context, options) =>
+                {
                     options.ValidateScopes = true;
                 })
                 .UseStartup<Startup>();

@@ -21,13 +21,13 @@ namespace PokeGraphQL.GraphQL.Resources.Encounters
             descriptor.Field(x => x.Values)
                 .Description("A list of possible values for this encounter condition.")
                 .Type<ListType<EncounterConditionValueType>>()
-                .Resolver(async (ctx, token) =>
+                .Resolver((ctx, token) =>
                 {
                     var service = ctx.Service<EncounterResolver>();
                     var resourceTasks = ctx.Parent<EncounterCondition>()
                     .Values
                     .Select(value => service.GetEncounterConditionValueAsync(value.Name, token));
-                    return await Task.WhenAll(resourceTasks);
+                    return Task.WhenAll(resourceTasks);
                 });
         }
     }

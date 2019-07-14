@@ -23,7 +23,6 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
         /// <inheritdoc/>
         protected override void ConcreteConfigure(IObjectTypeDescriptor<TypeProperty> descriptor)
         {
-            // TODO implement ignored fields
             descriptor.Description(@"Types are properties for Pokémon and their moves. 
                 Each type has three properties: which types of Pokémon it is super effective against, which types of Pokémon it is not very effective against
                 and which types of Pokémon it is completely ineffective against.");
@@ -32,31 +31,32 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
                 .Type<TypeRelationsType>();
             descriptor.Field(x => x.GameIndices)
                 .Description("A list of game indices relevent to this item by generation.")
-                .Ignore();
+                .Type<ListType<GenerationGameIndexType>>();
             descriptor.Field(x => x.Generation)
                 .Description("The generation this type was introduced in.")
                 .Type<GenerationType>()
                 .Resolver((ctx, token) => ctx.Service<GameResolver>().GetGenerationAsync(ctx.Parent<TypeProperty>().Generation.Name, token));
             descriptor.Field(x => x.MoveDamageClass)
                 .Description("The class of damage inflicted by this type.")
-                .Ignore();
+                .Type<MoveDamageClassType>()
+                .Resolver((ctx, token) => ctx.Service<MoveResolver>().GetMoveDamageClassAsync(ctx.Parent<TypeProperty>().MoveDamageClass.Name, token));
             descriptor.Field(x => x.Pokemon)
                 .Description("A list of details of pokemon that have this type.")
                 .Type<ListType<TypePokemonType>>();
             descriptor.Field(x => x.Moves)
                 .Description("A list of moves that have this type.")
                 .Type<ListType<MoveType>>()
-                .Resolver(async (ctx, token) =>
+                .Resolver((ctx, token) =>
                 {
                     var resolver = ctx.Service<MoveResolver>();
                     var resourceTasks = ctx.Parent<TypeProperty>()
                         .Moves
                         .Select(move => resolver.GetMoveAsync(move.Name, token));
-                    return await Task.WhenAll(resourceTasks);
+                    return Task.WhenAll(resourceTasks);
                 });
         }
 
-        private sealed class TypeRelationsType: ObjectType<TypeRelations>
+        private sealed class TypeRelationsType : ObjectType<TypeRelations>
         {
             protected override void Configure(IObjectTypeDescriptor<TypeRelations> descriptor)
             {
@@ -91,7 +91,8 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
             => (ctx, token) =>
             {
                 var resolver = ctx.Service<PokemonResolver>();
-                var resourceTasks = selector(ctx.Parent<TypeRelations>()).Select(type => resolver.GetTypeAsync(type.Name, token));
+                var resourceTasks = selector(ctx.Parent<TypeRelations>())
+                    .Select(type => resolver.GetTypeAsync(type.Name, token));
                 return Task.WhenAll(resourceTasks);
             };
         }

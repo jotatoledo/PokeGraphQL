@@ -29,8 +29,7 @@ namespace PokeGraphQL.GraphQL.Resources.Berries
             /// <inheritdoc/>
             protected override void Configure(IObjectTypeDescriptor<FlavorBerryMap> descriptor)
             {
-                // TODO remove once hotchocolate@9.1.0 lands
-                descriptor.BindFields(BindingBehavior.Explicit);
+                descriptor.FixStructType();
                 descriptor.Field(x => x.Potency);
                 descriptor.Field(x => x.Berry)
                     .Description("The berry with the referenced flavor.")

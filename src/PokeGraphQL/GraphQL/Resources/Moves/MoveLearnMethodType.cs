@@ -23,13 +23,13 @@ namespace PokeGraphQL.GraphQL.Resources.Moves
             descriptor.Field(x => x.VersionGroups)
                 .Description("A list of version groups where moves can be learned through this method.")
                 .Type<ListType<VersionGroupType>>()
-                .Resolver(async (ctx, token) =>
+                .Resolver((ctx, token) =>
                 {
                     var resolver = ctx.Service<GameResolver>();
                     var resourceTasks = ctx.Parent<MoveLearnMethod>()
                         .VersionGroups
                         .Select(versionGroup => resolver.GetVersionGroupAsync(versionGroup.Name, token));
-                    return await Task.WhenAll(resourceTasks);
+                    return Task.WhenAll(resourceTasks);
                 });
         }
     }

@@ -23,14 +23,11 @@ namespace PokeGraphQL.GraphQL.Resources.Moves
         /// <inheritdoc/>
         protected override void ConcreteConfigure(IObjectTypeDescriptor<Move> descriptor)
         {
-            // TODO implement ignored fields
             descriptor.Description(@"Moves are the skills of pokémon in battle. 
                 In battle, a Pokémon uses one move each turn. 
                 Some moves (including those learned by Hidden Machine) can be used outside 
                 of battle as well, usually for the purpose of removing obstacles or exploring new areas.");
             descriptor.Ignore(x => x.FlavorTextEntries);
-            descriptor.Field(x => x.Machines)
-                .Ignore();
             descriptor.Field(x => x.Accuracy)
                 .Description("The percent value of how likely this move is to be successful.");
             descriptor.Field(x => x.EffectChance)
@@ -62,7 +59,7 @@ namespace PokeGraphQL.GraphQL.Resources.Moves
                 .Ignore();
             descriptor.Field(x => x.EffectChanges)
                 .Description("The list of previous effects this move has had across version groups of the games.")
-                .Ignore();
+                .Type<ListType<AbilityEffectChangeType>>();
             descriptor.Field(x => x.Generation)
                 .Description("The generation in which this move was introduced.")
                 .Type<GenerationType>()
@@ -88,6 +85,8 @@ namespace PokeGraphQL.GraphQL.Resources.Moves
                 .Description("The elemental type of this move.")
                 .Type<TypePropertyType>()
                 .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetTypeAsync(ctx.Parent<Move>().Type.Name, token));
+            descriptor.Field(x => x.Machines)
+                .Type<ListType<MachineVersionDetailType>>();
         }
 
         private sealed class PastMoveStatValueType : ObjectType<PastMoveStatValue>
@@ -143,11 +142,10 @@ namespace PokeGraphQL.GraphQL.Resources.Moves
                     .Resolver((ctx, token) =>
                     {
                         var resolver = ctx.Service<MoveResolver>();
-                        var resourceTasks = MonadMaybe.Lift(ctx.Parent<ContestComboDetail>())
+                        return MonadMaybe.Lift(ctx.Parent<ContestComboDetail>())
                             .Select(x => x.UseBefore)
                             .Select(moves => moves.Select(move => resolver.GetMoveAsync(move.Name, token)))
-                            .Select(Task.WhenAll);
-                        return resourceTasks.HasValue ? resourceTasks.Value : Task.FromResult<Move[]>(default);
+                            .Match(value => Task.WhenAll(value), Task.FromResult<Move[]>(default));
                     });
                 descriptor.Field(x => x.UseAfter)
                     .Description("A list of moves to use after this move.")
@@ -155,11 +153,10 @@ namespace PokeGraphQL.GraphQL.Resources.Moves
                     .Resolver((ctx, token) =>
                     {
                         var resolver = ctx.Service<MoveResolver>();
-                        var resourceTasks = MonadMaybe.Lift(ctx.Parent<ContestComboDetail>())
+                        return MonadMaybe.Lift(ctx.Parent<ContestComboDetail>())
                             .Select(x => x.UseAfter)
                             .Select(moves => moves.Select(move => resolver.GetMoveAsync(move.Name, token)))
-                            .Select(Task.WhenAll);
-                        return resourceTasks.HasValue ? resourceTasks.Value : Task.FromResult<Move[]>(default);
+                            .Match(val => Task.WhenAll(val), Task.FromResult<Move[]>(default));
                     });
             }
         }

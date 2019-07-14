@@ -29,13 +29,13 @@ namespace PokeGraphQL.GraphQL.Resources.Locations
             descriptor.Field(x => x.Areas)
                 .Description("Areas that can be found within this location.")
                 .Type<ListType<LocationAreaType>>()
-                .Resolver(async (ctx, token) =>
+                .Resolver((ctx, token) =>
                 {
                     var resolver = ctx.Service<LocationResolver>();
                     var resourceTasks = ctx.Parent<Location>()
                         .Areas
                         .Select(area => resolver.GetLocationAreaAsync(Convert.ToInt32(area.Url.LastSegment()), token));
-                    return await Task.WhenAll(resourceTasks);
+                    return Task.WhenAll(resourceTasks);
                 });
         }
     }

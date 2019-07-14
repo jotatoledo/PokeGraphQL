@@ -10,6 +10,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
     using HotChocolate.Types;
     using PokeAPI;
     using PokeGraphQL.GraphQL.Resources.Berries;
+    using PokeGraphQL.GraphQL.Resources.Moves;
 
     internal sealed class NatureType : BaseNamedApiObjectType<Nature>
     {
@@ -51,11 +52,10 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
                 descriptor.Field(x => x.HighHPPrefernece)
                     .Name("highHpPreference")
                     .Description("Chance of using the move, in percent, if HP is over one half.");
-
-                // TODO implement ignored field
                 descriptor.Field(x => x.BattleStyle)
                     .Description("The move battle style.")
-                    .Ignore();
+                    .Type<MoveBattleStyleType>()
+                    .Resolver((ctx, token) => ctx.Service<MoveResolver>().GetMoveBattleStyleAsync(ctx.Parent<MoveBattleStylePreference>().BattleStyle.Name, token));
             }
         }
 

@@ -25,13 +25,13 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
             descriptor.Field(x => x.RequiredForEvolution)
                 .Description("A list of pokémon species that required this gender in order for a pokémon to evolve into them")
                 .Type<ListType<PokemonSpeciesType>>()
-                .Resolver(async (ctx, token) =>
+                .Resolver((ctx, token) =>
                 {
                     var resolver = ctx.Service<PokemonResolver>();
                     var resourceTasks = ctx.Parent<Gender>()
                         .RequiredForEvolution
                         .Select(species => resolver.GetPokemonSpeciesAsync(species.Name, token));
-                    return await Task.WhenAll(resourceTasks);
+                    return Task.WhenAll(resourceTasks);
                 });
         }
 

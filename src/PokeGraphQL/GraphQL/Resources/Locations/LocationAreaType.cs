@@ -11,6 +11,8 @@ namespace PokeGraphQL.GraphQL.Resources.Locations
     using PokeAPI;
     using PokeGraphQL.GraphQL.Resources.Encounters;
     using PokeGraphQL.GraphQL.Resources.Games;
+    using PokeGraphQL.GraphQL.Resources.Pokemons;
+    using PokemonType = PokeGraphQL.GraphQL.Resources.Pokemons.PokemonType;
 
     internal sealed class LocationAreaType : BaseNamedApiObjectType<LocationArea>
     {
@@ -38,14 +40,14 @@ namespace PokeGraphQL.GraphQL.Resources.Locations
         {
             protected override void Configure(IObjectTypeDescriptor<PokemonEncounter> descriptor)
             {
-                // TODO implement ignored fields
                 descriptor.FixStructType();
                 descriptor.Field(x => x.Pokemon)
                     .Description("The pokémon being encountered.")
-                    .Ignore();
+                    .Type<PokemonType>()
+                    .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetPokemonAsync(ctx.Parent<PokemonEncounter>().Pokemon.Name, token));
                 descriptor.Field(x => x.VersionDetails)
                     .Description("A list of versions and encounters with pokémon that might happen in the referenced location area.")
-                    .Ignore();
+                    .Type<ListType<VersionEncounterDetailType>>();
             }
         }
 

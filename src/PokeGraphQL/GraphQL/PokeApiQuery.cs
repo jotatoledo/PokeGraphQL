@@ -11,9 +11,12 @@ namespace PokeGraphQL.GraphQL
     using PokeGraphQL.GraphQL.Resources.Berries;
     using PokeGraphQL.GraphQL.Resources.Contests;
     using PokeGraphQL.GraphQL.Resources.Encounters;
+    using PokeGraphQL.GraphQL.Resources.Evolutions;
     using PokeGraphQL.GraphQL.Resources.Games;
     using PokeGraphQL.GraphQL.Resources.Items;
+    using PokeGraphQL.GraphQL.Resources.Languages;
     using PokeGraphQL.GraphQL.Resources.Locations;
+    using PokeGraphQL.GraphQL.Resources.Machines;
     using PokeGraphQL.GraphQL.Resources.Moves;
     using PokeGraphQL.GraphQL.Resources.Pokemons;
 
@@ -32,6 +35,33 @@ namespace PokeGraphQL.GraphQL
             RegisterLocationResources(descriptor);
             RegisterPokemonResources(descriptor);
             RegisterMoveResources(descriptor);
+            RegisterEvolutionResources(descriptor);
+            RegisterLanguageResources(descriptor);
+            RegisterMachineResources(descriptor);
+        }
+
+        private static void RegisterMachineResources(IObjectTypeDescriptor descriptor)
+        {
+            descriptor.Field("machine")
+                .Type<MachineType>()
+                .Argument("id", a => a.Type<IntType>().Description("The identifier for the resource."))
+                .Resolver((ctx, token) => ctx.Service<MachineResolver>().GetMachineAsync(ctx.Argument<int>("id"), token));
+        }
+
+        private static void RegisterLanguageResources(IObjectTypeDescriptor descriptor)
+        {
+            descriptor.Field("berry")
+                .Type<LanguageType>()
+                .Argument("nameOrId", a => a.Type<StringType>().Description("The identifier or name for the resource."))
+                .Resolver((ctx, token) => ctx.Service<LanguageResolver>().GetLanguageAsync(ctx.Argument<string>("nameOrId"), token));
+        }
+
+        private static void RegisterEvolutionResources(IObjectTypeDescriptor descriptor)
+        {
+            descriptor.Field("evolutionChain")
+                .Type<SuperContestEffectType>()
+                .Argument("id", a => a.Type<IntType>().Description("The identifier for the resource."))
+                .Resolver((ctx, token) => ctx.Service<EvolutionResolver>().GetEvolutionChainAsync(ctx.Argument<int>("id"), token));
         }
 
         private static void RegisterBerryResources(IObjectTypeDescriptor descriptor)
@@ -170,7 +200,7 @@ namespace PokeGraphQL.GraphQL
                 .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetPokemonAsync(ctx.Argument<string>("nameOrId"), token));
         }
 
-        private void RegisterMoveResources(IObjectTypeDescriptor descriptor)
+        private static void RegisterMoveResources(IObjectTypeDescriptor descriptor)
         {
             descriptor.Field("move")
                 .Type<MoveType>()

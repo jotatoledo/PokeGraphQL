@@ -4,6 +4,18 @@
   "repository": "https://github.com/jotatoledo/PokeGraphQL",
   "keywords": [ "aspnet", "core","graphql" ],
   "stack": "heroku-18",
+  "env": {
+    "ASPNETCORE_FORWARDEDHEADERS_ENABLED": {
+      "description": "Turns the forward-header-middleware on. Needed to forward the scheme for Linux and non-IIS reverse proxies.",
+      "value": "true",
+      "required": true
+    },
+    "ASPNETCORE_HSTS_ENABLED": {
+      "description": "Turns the HSTS-middleware on. The middleware options are set to the minimal requirements described in https://hstspreload.org/",
+      "value": "true",
+      "required": false
+    }
+  },
   "buildpacks": [
     {
       "url": "https://github.com/jincod/dotnetcore-buildpack"

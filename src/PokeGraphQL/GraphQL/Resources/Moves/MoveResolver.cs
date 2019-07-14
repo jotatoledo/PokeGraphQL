@@ -24,5 +24,7 @@ namespace PokeGraphQL.GraphQL.Resources.Moves
         public virtual async Task<MoveTarget> GetMoveTargetAsync(string nameOrId, CancellationToken cancellationToken = default) => await DataFetcher.GetNamedApiObject<MoveTarget>(nameOrId).ConfigureAwait(false);
 
         public virtual async Task<MoveCategory> GetMoveCategoryAsync(string nameOrId, CancellationToken cancellationToken = default) => await DataFetcher.GetNamedApiObject<MoveCategory>(nameOrId).ConfigureAwait(false);
+
+        public virtual async Task<MoveBattleStyle> GetMoveBattleStyleAsync(string nameOrId, CancellationToken cancellationToken = default) => await DataFetcher.GetNamedApiObject<MoveBattleStyle>(nameOrId).ConfigureAwait(false);
     }
 }

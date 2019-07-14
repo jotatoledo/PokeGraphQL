@@ -1,4 +1,4 @@
-﻿// <copyright file="ContestType.cs" company="PokeGraphQL.Net">
+﻿// <copyright file="ContestTypeType.cs" company="PokeGraphQL.Net">
 // Copyright (c) PokeGraphQL.Net. All rights reserved.
 //
 // Licensed under the MIT license.
