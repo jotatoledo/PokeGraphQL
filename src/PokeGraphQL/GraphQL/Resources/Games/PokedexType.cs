@@ -12,25 +12,22 @@ namespace PokeGraphQL.GraphQL.Resources.Games
     using HotChocolate.Types;
     using PokeAPI;
     using PokeGraphQL.GraphQL.Resources.Locations;
+    using PokeGraphQL.GraphQL.Resources.Pokemons;
 
     internal sealed class PokedexType : BaseNamedApiObjectType<Pokedex>
     {
         /// <inheritdoc/>
         protected override void ConcreteConfigure(IObjectTypeDescriptor<Pokedex> descriptor)
         {
-            // TODO: implement ignored fields
             descriptor.Description(@"A Pokédex is a handheld electronic encyclopedia device; one which is capable of recording 
             and retaining information of the various Pokémon in a given region with the exception of the national dex
             and some smaller dexes related to portions of a region.");
             descriptor.Field(x => x.IsMainSeries)
                 .Description("Whether or not this pokédex originated in the main series of the video games.");
-            descriptor.Field(x => x.Descriptions)
-                .Description("The description of this pokédex listed in different languages.")
-                .Ignore();
             descriptor.Field(x => x.Entries)
                 .Name("pokemonEntries")
                 .Description("A list of pokémon catalogued in this pokédex  and their indexes.")
-                .Ignore();
+                .Type<ListType<PokemonEntryType>>();
             descriptor.Field(x => x.Region)
                 .Description("The region this pokédex catalogues pokémon for.")
                 .Type<RegionType>()
@@ -38,14 +35,33 @@ namespace PokeGraphQL.GraphQL.Resources.Games
             descriptor.Field(x => x.VersionGroups)
                 .Description("A list of version groups this pokédex is relevent to.")
                 .Type<ListType<VersionGroupType>>()
-                .Resolver(async (ctx, token) =>
+                .Resolver((ctx, token) =>
                 {
                     var resolver = ctx.Service<GameResolver>();
                     var resourceTasks = ctx.Parent<Pokedex>()
-                    .VersionGroups
-                    .Select(versionGroup => resolver.GetVersionGroupAsync(versionGroup.Name, token));
-                    return await Task.WhenAll(resourceTasks);
+                        .VersionGroups
+                        .Select(versionGroup => resolver.GetVersionGroupAsync(versionGroup.Name, token));
+                    return Task.WhenAll(resourceTasks);
                 });
+
+            // TODO: implement ignored field
+            descriptor.Field(x => x.Descriptions)
+                .Description("The description of this pokédex listed in different languages.")
+                .Ignore();
+        }
+
+        private sealed class PokemonEntryType : ObjectType<PokemonEntry>
+        {
+            protected override void Configure(IObjectTypeDescriptor<PokemonEntry> descriptor)
+            {
+                descriptor.FixStructType();
+                descriptor.Field(x => x.EntryNumber)
+                    .Description("The index of this pokémon species entry within the pokédex.");
+                descriptor.Field(x => x.Species)
+                    .Description("The pokémon species being encountered.")
+                    .Type<PokemonSpeciesType>()
+                    .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetPokemonSpeciesAsync(ctx.Parent<PokemonEntry>().Species.Name, token));
+            }
         }
     }
 }
