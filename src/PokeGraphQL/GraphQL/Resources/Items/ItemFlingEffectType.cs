@@ -17,19 +17,20 @@ namespace PokeGraphQL.GraphQL.Resources.Items
         /// <inheritdoc/>
         protected override void ConcreteConfigure(IObjectTypeDescriptor<ItemFlingEffect> descriptor)
         {
-            // TODO add missing props
             descriptor.Description("The various effects of the move \"Fling\" when used with different items.");
-            descriptor.Ignore(x => x.Effects);
+            descriptor.Field(x => x.Effects)
+                .Description("The result of this fling effect listed in different languages.")
+                .Type<ListType<EffectType>>();
             descriptor.Field(x => x.Items)
                 .Description("A list of items that have this fling effect.")
                 .Type<ListType<ItemType>>()
-                .Resolver(async (ctx, token) =>
+                .Resolver((ctx, token) =>
                 {
                     var resolver = ctx.Service<ItemResolver>();
                     var resourceTasks = ctx.Parent<ItemFlingEffect>()
                         .Items
                         .Select(item => resolver.GetItemAsync(item.Name, token));
-                    return await Task.WhenAll(resourceTasks);
+                    return Task.WhenAll(resourceTasks);
                 });
         }
     }
