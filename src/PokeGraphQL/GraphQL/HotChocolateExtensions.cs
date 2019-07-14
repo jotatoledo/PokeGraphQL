@@ -12,6 +12,7 @@ namespace PokeGraphQL.GraphQL
     using HotChocolate.Utilities;
     using Microsoft.Extensions.DependencyInjection;
     using PokeGraphQL.GraphQL.Converters;
+    using PokeGraphQL.GraphQL.Resources;
     using PokeGraphQL.GraphQL.Resources.Berries;
     using PokeGraphQL.GraphQL.Resources.Contests;
     using PokeGraphQL.GraphQL.Resources.Encounters;
@@ -37,6 +38,7 @@ namespace PokeGraphQL.GraphQL
             services.AddScoped<MoveResolver>();
             services.AddScoped<EvolutionResolver>();
             services.AddScoped<LanguageResolver>();
+            services.AddScoped<UrlResolver>();
 
             services.AddGraphQL(
                 sp => SchemaBuilder.New()
