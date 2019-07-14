@@ -69,6 +69,22 @@ namespace PokeGraphQL
                 }
             }
 
+            app.UseXfo(options => options.Deny())
+                .UseXXssProtection(options => options.EnabledWithBlockMode())
+                .UseXContentTypeOptions()
+                .UseReferrerPolicy(options => options.StrictOriginWhenCrossOrigin())
+                .UseCsp(options => options
+                    .DefaultSources(s => s.Self())
+                    .ScriptSources(s => s.Self().UnsafeInline())
+                    .StyleSources(s => s.Self().UnsafeInline())
+                    .ObjectSources(s => s.None())
+                    .ImageSources(s => s.Self())
+                    .MediaSources(s => s.None())
+                    .FrameSources(s => s.None())
+                    .FontSources(s => s.None())
+                    .ConnectSources(s => s.Self())
+                    .WorkerSources(s => s.Self().CustomSources("blob:")));
+
             app.UseGraphQL("/graphql")
                 .UseGraphiQL(new GraphiQLOptions
                 {

@@ -6,7 +6,7 @@ All the Pokémon data you'll ever need in one place, easily accessible through a 
 
 > The RESTful API provided by the awesome [PokeAPI project](https://github.com/PokeAPI/pokeapi) is consumed through the [PokeApi.Net project](https://gitlab.com/PoroCYon/PokeApi.NET).
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/jotatoledo/PokeGraphQL/tree/master)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
 ## Docker
 
