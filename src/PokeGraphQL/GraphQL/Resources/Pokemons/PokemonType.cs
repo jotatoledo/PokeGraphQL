@@ -7,17 +7,21 @@
 
 namespace PokeGraphQL.GraphQL.Resources.Pokemons
 {
+    using System;
     using System.Linq;
     using System.Threading.Tasks;
     using HotChocolate.Types;
     using PokeAPI;
+    using PokeGraphQL.GraphQL.Resources.Games;
+    using PokeGraphQL.GraphQL.Resources.Items;
+    using PokeGraphQL.GraphQL.Resources.Locations;
+    using PokeGraphQL.GraphQL.Resources.Moves;
 
     internal sealed class PokemonType : BaseNamedApiObjectType<Pokemon>
     {
         /// <inheritdoc/>
         protected override void ConcreteConfigure(IObjectTypeDescriptor<Pokemon> descriptor)
         {
-            // TODO implement ignored fields
             descriptor.Description(@"Pokémon are the creatures that inhabit the world of the pokemon games. 
                 They can be caught using pokéballs and trained by battling with other pokémon.");
             descriptor.Ignore(x => x.Sprites);
@@ -38,36 +42,110 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
             descriptor.Field(x => x.Forms)
                 .Description("A list of forms this pokémon can take on.")
                 .Type<ListType<PokemonFormType>>()
-                .Resolver(async (ctx, token) =>
+                .Resolver((ctx, token) =>
                 {
                     var resolver = ctx.Service<PokemonResolver>();
                     var resourceTasks = ctx.Parent<Pokemon>()
                         .Forms
                         .Select(form => resolver.GetPokemonFormAsync(form.Name, token));
-                    return await Task.WhenAll(resourceTasks);
+                    return Task.WhenAll(resourceTasks);
                 });
-            descriptor.Field(x => x.GameIndices)
-                .Description("A list of game indices relevent to pokémon item by generation.")
-                .Ignore();
-            descriptor.Field(x => x.HeldItems)
-                .Description("A list of items this pokémon may be holding when encountered.")
-                .Ignore();
-            descriptor.Field(x => x.LocationAreaEncounters)
-                .Description("A list of location areas as well as encounter details pertaining to specific versions.")
-                .Ignore();
-            descriptor.Field(x => x.Moves)
-                .Description("A list of moves along with learn methods and level details pertaining to specific version groups.")
-                .Ignore();
             descriptor.Field(x => x.Species)
                 .Description("The species this pokémon belongs to.")
                 .Type<PokemonSpeciesType>()
                 .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetPokemonSpeciesAsync(ctx.Parent<Pokemon>().Species.Name, token));
-            descriptor.Field(x => x.Stats)
-                .Description("A list of base stat values for this pokémon.")
-                .Ignore();
             descriptor.Field(x => x.Types)
                 .Description("A list of details showing types this pokémon has.")
                 .Type<ListType<PokemonTypeMapType>>();
+            descriptor.Field(x => x.HeldItems)
+                .Description("A list of items this pokémon may be holding when encountered.")
+                .Type<ListType<PokemonHeldItemType>>();
+            descriptor.Field(x => x.Moves)
+                .Description("A list of moves along with learn methods and level details pertaining to specific version groups.")
+                .Type<ListType<PokemonMoveType>>();
+            descriptor.Field(x => x.Stats)
+                .Description("A list of base stat values for this pokémon.")
+                .Type<ListType<PokemonStatType>>();
+            descriptor.Field(x => x.GameIndices)
+                .Description("A list of game indices relevent to pokémon item by generation.")
+                .Type<ListType<VersionGameIndexType>>();
+
+            // TODO unignore once a new version of PokeAPI is released
+            descriptor.Field(x => x.LocationAreaEncounters)
+                .Description("A list of location areas as well as encounter details pertaining to specific versions.")
+                .Type<ListType<LocationAreaEncounterType>>()
+                .Resolver((ctx, token) => ctx.Service<UrlResolver>().GetAsync<LocationAreaEncounter[]>(ctx.Parent<Pokemon>().LocationAreaEncounters.Path))
+                .Ignore();
+        }
+
+        private sealed class LocationAreaEncounterType : ObjectType<LocationAreaEncounter>
+        {
+            protected override void Configure(IObjectTypeDescriptor<LocationAreaEncounter> descriptor)
+            {
+                descriptor.FixStructType();
+                descriptor.Field(x => x.LocationArea)
+                    .Type<LocationAreaType>()
+                    .Resolver((ctx, token) => ctx.Service<LocationResolver>().GetLocationAreaAsync(Convert.ToInt32(ctx.Parent<LocationAreaEncounter>().LocationArea.Url.LastSegment()), token));
+                descriptor.Field(x => x.VersionDetails)
+                    .Type<ListType<VersionEncounterDetailType>>();
+            }
+        }
+
+        private sealed class PokemonStatType : ObjectType<PokemonStats>
+        {
+            protected override void Configure(IObjectTypeDescriptor<PokemonStats> descriptor)
+            {
+                descriptor.FixStructType();
+                descriptor.Field(x => x.BaseValue);
+                descriptor.Field(x => x.Effort);
+                descriptor.Field(x => x.Stat)
+                    .Type<StatType>()
+                    .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetStatAsync(ctx.Parent<PokemonStats>().Stat.Name, token));
+            }
+        }
+
+        private sealed class MoveVersionGroupDetailType : ObjectType<MoveVersionGroupDetails>
+        {
+            protected override void Configure(IObjectTypeDescriptor<MoveVersionGroupDetails> descriptor)
+            {
+                descriptor.FixStructType();
+                descriptor.Field(x => x.LearnedAt);
+                descriptor.Field(x => x.VersionGroup)
+                    .Type<VersionGroupType>()
+                    .Resolver((ctx, token) => ctx.Service<GameResolver>().GetVersionGroupAsync(ctx.Parent<MoveVersionGroupDetails>().VersionGroup.Name, token));
+                descriptor.Field(x => x.LearnMethod)
+                    .Type<MoveLearnMethodType>()
+                    .Resolver((ctx, token) => ctx.Service<MoveResolver>().GetMoveLearnMethodAsync(ctx.Parent<MoveVersionGroupDetails>().LearnMethod.Name, token));
+            }
+        }
+
+        private sealed class PokemonMoveType : ObjectType<PokemonMove>
+        {
+            protected override void Configure(IObjectTypeDescriptor<PokemonMove> descriptor)
+            {
+                descriptor.FixStructType();
+                descriptor.Field(x => x.Move)
+                    .Type<MoveType>()
+                    .Resolver((ctx, token) => ctx.Service<MoveResolver>().GetMoveAsync(ctx.Parent<PokemonMove>().Move.Name, token));
+                descriptor.Field(x => x.VersionGroupDetails)
+                    .Type<ListType<MoveVersionGroupDetailType>>();
+            }
+        }
+
+        private sealed class PokemonHeldItemType : ObjectType<PokemonHeldItem>
+        {
+            protected override void Configure(IObjectTypeDescriptor<PokemonHeldItem> descriptor)
+            {
+                descriptor.FixStructType();
+                descriptor.Field(x => x.Item)
+                    .Description("The item that may be holded.")
+                    .Type<ItemType>()
+                    .Resolver((ctx, token) => ctx.Service<ItemResolver>().GetItemAsync(ctx.Parent<PokemonHeldItem>().Item.Name, token));
+                descriptor.Field(x => x.VersionDetails)
+                    .Description("Details on chance of the pokemon having the item based on version.")
+                    .Type<ListType<HeldItemVersionDetailsType>>();
+
+            }
         }
 
         private sealed class PokemonAbilityType : ObjectType<PokemonAbility>

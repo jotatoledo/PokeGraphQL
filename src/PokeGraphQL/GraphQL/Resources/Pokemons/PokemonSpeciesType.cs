@@ -14,6 +14,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
     using PokeAPI;
     using PokeGraphQL.GraphQL.Resources.Evolutions;
     using PokeGraphQL.GraphQL.Resources.Games;
+    using PokeGraphQL.GraphQL.Resources.Languages;
     using PokeGraphQL.GraphQL.Resources.Locations;
 
     internal sealed class PokemonSpeciesType : BaseNamedApiObjectType<PokemonSpecies>
@@ -21,12 +22,10 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
         /// <inheritdoc/>
         protected override void ConcreteConfigure(IObjectTypeDescriptor<PokemonSpecies> descriptor)
         {
-            // TODO implement ignored fields
             descriptor.Description(@"A Pokémon Species forms the basis for at least one pokémon. 
                 Attributes of a Pokémon species are shared across all varieties of pokémon within the species. 
                 A good example is Wormadam; Wormadam is the species which can be found in three different varieties, Wormadam-Trash, Wormadam-Sandy and Wormadam-Plant.");
             descriptor.Ignore(x => x.Descriptions);
-            descriptor.Ignore(x => x.FlavorTexts);
             descriptor.Field(x => x.Order)
                 .Description(@"The order in which species should be sorted.
                     Based on National Dex order, except families are grouped together and sorted by stage.");
@@ -95,7 +94,39 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
                 .Type<ListType<GenusType>>();
             descriptor.Field(x => x.Varieties)
                 .Description("A list of the pokémon that exist within this pokémon species.")
-                .Ignore();
+                .Type<ListType<PokemonSpeciesVarietyType>>();
+            descriptor.Field(x => x.FlavorTexts)
+                .Type<ListType<PokemonSpeciesFlavorTextType>>();
+        }
+
+        private sealed class PokemonSpeciesFlavorTextType : ObjectType<PokemonSpeciesFlavorText>
+        {
+            protected override void Configure(IObjectTypeDescriptor<PokemonSpeciesFlavorText> descriptor)
+            {
+                descriptor.FixStructType();
+                descriptor.Field(x => x.FlavorText)
+                    .Name("text")
+                    .Description("The text the flavor resource.");
+                descriptor.Field(x => x.Version)
+                    .Type<VersionType>()
+                    .Resolver((ctx, token) => ctx.Service<GameResolver>().GetVersionAsync(ctx.Parent<PokemonSpeciesFlavorText>().Version.Name, token));
+                descriptor.Field(x => x.Language)
+                    .Description("The language this text is in.")
+                    .Type<LanguageType>()
+                    .Resolver((ctx, token) => ctx.Service<LanguageResolver>().GetLanguageAsync(ctx.Parent<PokemonSpeciesFlavorText>().Language.Name, token));
+            }
+        }
+
+        private sealed class PokemonSpeciesVarietyType : ObjectType<PokemonSpeciesVariety>
+        {
+            protected override void Configure(IObjectTypeDescriptor<PokemonSpeciesVariety> descriptor)
+            {
+                descriptor.FixStructType();
+                descriptor.Field(x => x.IsDefault);
+                descriptor.Field(x => x.Pokemon)
+                    .Type<PokemonType>()
+                    .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetPokemonAsync(ctx.Parent<PokemonSpeciesVariety>().Pokemon.Name, token));
+            }
         }
 
         private sealed class PokemonSpeciesDexEntryType : ObjectType<PokemonSpeciesDexEntry>
@@ -119,11 +150,10 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
                 descriptor.FixStructType();
                 descriptor.Field(x => x.Name)
                     .Description("The localized genus for the referenced pokémon species.");
-
-                // TODO implement ignored field
                 descriptor.Field(x => x.Language)
                     .Description("The language this genus is in.")
-                    .Ignore();
+                    .Type<LanguageType>()
+                    .Resolver((ctx, token) => ctx.Service<LanguageResolver>().GetLanguageAsync(ctx.Parent<Genus>().Language.Name, token));
             }
         }
 

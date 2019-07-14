@@ -16,7 +16,6 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
         /// <inheritdoc/>
         protected override void ConcreteConfigure(IObjectTypeDescriptor<Ability> descriptor)
         {
-            // TODO implement ignored fields
             descriptor.Description(@"Abilities provide passive effects for pokémon in battle or in the overworld.
                 Pokémon have mutiple possible abilities but can have only one ability at a time.");
             descriptor.Field(x => x.IsMainSeries)
@@ -27,16 +26,16 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
                 .Resolver((ctx, token) => ctx.Service<GameResolver>().GetGenerationAsync(ctx.Parent<Ability>().Generation.Name, token));
             descriptor.Field(x => x.Effects)
                 .Description("The effect of this ability listed in different languages.")
-                .Ignore();
+                .Type<ListType<VerboseEffectType>>();
             descriptor.Field(x => x.EffectChanges)
                 .Description("The list of previous effects this ability has had across version groups.")
-                .Ignore();
-            descriptor.Field(x => x.FlavorTexts)
-                .Description("The flavor text of this ability listed in different languages")
-                .Ignore();
+                .Type<ListType<AbilityEffectChangeType>>();
             descriptor.Field(x => x.Pokemon)
                 .Description("A list of pokémon that could potentially have this ability.")
                 .Type<ListType<AbilityPokemonType>>();
+            descriptor.Field(x => x.FlavorTexts)
+                .Description("The flavor text of this ability listed in different languages")
+                .Type<ListType<VersionGroupFlavorTextType>>();
         }
 
         private sealed class AbilityPokemonType : ObjectType<AbilityPokemon>

@@ -12,13 +12,13 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
     using System.Threading.Tasks;
     using HotChocolate.Types;
     using PokeAPI;
+    using PokeGraphQL.GraphQL.Resources.Moves;
 
     internal sealed class StatType : BaseNamedApiObjectType<Stat>
     {
         /// <inheritdoc/>
         protected override void ConcreteConfigure(IObjectTypeDescriptor<Stat> descriptor)
         {
-            // TODO implement ignored fields
             descriptor.Description(@"Stats determine certain aspects of battles. 
                 Each pokémon has a value for each stat which grows as they gain levels and can be altered momenarily by effects in battles.");
             descriptor.Field(x => x.GameIndex)
@@ -44,7 +44,8 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
                 });
             descriptor.Field(x => x.MoveDamageClass)
                 .Description("The class of damage this stat is directly related to.")
-                .Ignore();
+                .Type<MoveDamageClassType>()
+                .Resolver((ctx, token) => ctx.Service<MoveResolver>().GetMoveDamageClassAsync(ctx.Parent<Stat>().MoveDamageClass.Name, token));
         }
 
         private sealed class NatureStatAffectType : ObjectType<StatAffectNature>
@@ -84,12 +85,11 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
                 descriptor.FixStructType();
                 descriptor.Field(x => x.Change)
                     .Description("The maximum amount of change to the referenced stat.");
-
-                // TODO implement ignored field
                 descriptor.Field(x => x.Resource)
                     .Name("move")
                     .Description("The move causing the change.")
-                    .Ignore();
+                    .Type<MoveType>()
+                    .Resolver((ctx, token) => ctx.Service<MoveResolver>().GetMoveDamageClassAsync(ctx.Parent<StatAffect<Move>>().Resource.Name, token));
             }
         }
 

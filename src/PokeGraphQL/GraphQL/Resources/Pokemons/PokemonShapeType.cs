@@ -11,6 +11,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
     using System.Threading.Tasks;
     using HotChocolate.Types;
     using PokeAPI;
+    using PokeGraphQL.GraphQL.Resources.Languages;
 
     internal sealed class PokemonShapeType : BaseNamedApiObjectType<PokemonShape>
     {
@@ -24,13 +25,13 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
             descriptor.Field(x => x.Species)
                 .Description("A list of the pokémon species that have this shape.")
                 .Type<ListType<PokemonSpeciesType>>()
-                .Resolver(async (ctx, token) =>
+                .Resolver((ctx, token) =>
                 {
                     var resolver = ctx.Service<PokemonResolver>();
                     var resourceTasks = ctx.Parent<PokemonShape>()
                         .Species
                         .Select(species => resolver.GetPokemonSpeciesAsync(species.Name, token));
-                    return await Task.WhenAll(resourceTasks);
+                    return Task.WhenAll(resourceTasks);
                 });
         }
 
@@ -41,11 +42,10 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
                 descriptor.FixStructType();
                 descriptor.Field(x => x.Name)
                     .Description("The localized \"scientific\" name for an API resource in a specific language.");
-
-                // TODO implement ignored field
                 descriptor.Field(x => x.Language)
                     .Description("The language this \"scientific\" name is in.")
-                    .Ignore();
+                    .Type<LanguageType>()
+                    .Resolver((ctx, token) => ctx.Service<LanguageResolver>().GetLanguageAsync(ctx.Parent<AwesomeName>().Language.Name, token));
             }
         }
     }
