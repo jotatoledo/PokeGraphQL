@@ -10,7 +10,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
     using System.Linq;
     using System.Threading.Tasks;
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
 
     internal sealed class GenderType : BaseNamedApiObjectType<Gender>
     {
@@ -19,7 +19,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
         {
             descriptor.Description(@"Genders were introduced in Generation II for the purposes of breeding pokémon 
                 but can also result in visual differences or even different evolutionary lines.");
-            descriptor.Field(x => x.SpeciesDetails)
+            descriptor.Field(x => x.PokemonSpeciesDetails)
                 .Description("A list of pokémon species that can be this gender and how likely it is that they will be.")
                 .Type<ListType<PokemonSpeciesGenderType>>();
             descriptor.Field(x => x.RequiredForEvolution)
@@ -39,14 +39,13 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
         {
             protected override void Configure(IObjectTypeDescriptor<PokemonSpeciesGender> descriptor)
             {
-                descriptor.FixStructType();
-                descriptor.Field(x => x.FamaleToMaleRate)
+                descriptor.Field(x => x.Rate)
                     .Name("genderRate")
                     .Description("The chance of this Pokémon being female, in eighths; or -1 for genderless.");
-                descriptor.Field(x => x.Species)
+                descriptor.Field(x => x.PokemonSpecies)
                     .Description("A pokemon species that can be the referenced gender")
                     .Type<PokemonSpeciesType>()
-                    .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetPokemonSpeciesAsync(ctx.Parent<PokemonSpeciesGender>().Species.Name, token));
+                    .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetPokemonSpeciesAsync(ctx.Parent<PokemonSpeciesGender>().PokemonSpecies.Name, token));
             }
         }
     }

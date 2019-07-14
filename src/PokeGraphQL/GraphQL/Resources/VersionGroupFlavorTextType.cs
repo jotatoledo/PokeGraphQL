@@ -8,7 +8,7 @@
 namespace PokeGraphQL.GraphQL.Resources
 {
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources.Games;
     using PokeGraphQL.GraphQL.Resources.Languages;
 
@@ -17,7 +17,6 @@ namespace PokeGraphQL.GraphQL.Resources
         /// <inheritdoc/>
         protected override void Configure(IObjectTypeDescriptor<VersionGroupFlavorText> descriptor)
         {
-            descriptor.FixStructType();
             descriptor.Field(x => x.Text)
                 .Description("The localized name for an api resource in a specific language.");
             descriptor.Field(x => x.Language)

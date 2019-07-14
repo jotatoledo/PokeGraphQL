@@ -8,7 +8,7 @@
 namespace PokeGraphQL.GraphQL.Resources
 {
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources.Games;
 
     internal sealed class GenerationGameIndexType : ObjectType<GenerationGameIndex>
@@ -16,7 +16,6 @@ namespace PokeGraphQL.GraphQL.Resources
         /// <inheritdoc/>
         protected override void Configure(IObjectTypeDescriptor<GenerationGameIndex> descriptor)
         {
-            descriptor.FixStructType();
             descriptor.Field(x => x.GameIndex)
                 .Description("The internal id of an api resource within game data.");
             descriptor.Field(x => x.Generation)

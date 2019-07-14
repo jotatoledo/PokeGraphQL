@@ -10,14 +10,13 @@ namespace PokeGraphQL.GraphQL.Resources.Encounters
     using System.Linq;
     using System.Threading.Tasks;
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
 
     internal sealed class EncounterType : ObjectType<Encounter>
     {
         /// <inheritdoc/>
         protected override void Configure(IObjectTypeDescriptor<Encounter> descriptor)
         {
-            descriptor.FixStructType();
             descriptor.Field(x => x.ConditionValues)
                 .Type<ListType<EncounterConditionValueType>>()
                 .Resolver((ctx, token) =>

@@ -9,10 +9,18 @@ namespace PokeGraphQL.GraphQL.Resources.Machines
 {
     using System.Threading;
     using System.Threading.Tasks;
-    using PokeAPI;
+    using PokeApiNet.Data;
+    using PokeApiNet.Models;
 
     public class MachineResolver
     {
-        public virtual async Task<Machine> GetMachineAsync(int id, CancellationToken cancellationToken = default) => await DataFetcher.GetApiObject<Machine>(id).ConfigureAwait(false);
+        private readonly PokeApiClient pokeApiClient;
+
+        public MachineResolver(PokeApiClient pokeApiClient)
+        {
+            this.pokeApiClient = pokeApiClient;
+        }
+
+        public virtual async Task<Machine> GetMachineAsync(int id, CancellationToken cancellationToken = default) => await this.pokeApiClient.GetResourceAsync<Machine>(id).ConfigureAwait(false);
     }
 }

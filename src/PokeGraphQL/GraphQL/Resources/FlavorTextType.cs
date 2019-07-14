@@ -8,21 +8,20 @@
 namespace PokeGraphQL.GraphQL.Resources
 {
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources.Languages;
 
-    internal sealed class FlavorTextType : ObjectType<FlavorText>
+    internal sealed class FlavorTextType : ObjectType<FlavorTexts>
     {
         /// <inheritdoc/>
-        protected override void Configure(IObjectTypeDescriptor<FlavorText> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<FlavorTexts> descriptor)
         {
-            descriptor.FixStructType();
-            descriptor.Field(x => x.Text)
+            descriptor.Field(x => x.FlavorText)
                 .Description("The localized name for an api resource in a specific language.");
             descriptor.Field(x => x.Language)
                 .Description("The language this flavor text is in")
                 .Type<LanguageType>()
-                .Resolver((ctx, token) => ctx.Service<LanguageResolver>().GetLanguageAsync(ctx.Parent<FlavorText>().Language.Name, token));
+                .Resolver((ctx, token) => ctx.Service<LanguageResolver>().GetLanguageAsync(ctx.Parent<FlavorTexts>().Language.Name, token));
         }
     }
 }

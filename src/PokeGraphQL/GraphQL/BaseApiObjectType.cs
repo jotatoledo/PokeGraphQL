@@ -9,10 +9,10 @@ namespace PokeGraphQL.GraphQL
 {
     using System.Text.RegularExpressions;
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
 
     internal abstract class BaseApiObjectType<TType> : ObjectType<TType>
-        where TType : ApiObject
+        where TType : ResourceBase
     {
         private static readonly string Pattern = "(.+?)([A-Z])";
 
@@ -32,8 +32,7 @@ namespace PokeGraphQL.GraphQL
         /// <inheritdoc/>
         protected override void Configure(IObjectTypeDescriptor<TType> descriptor)
         {
-            descriptor.Field(x => x.ID)
-                .Name("id")
+            descriptor.Field(x => x.Id)
                 .Description($"The identifier for this {this.ResourceName} resource");
             this.ConcreteConfigure(descriptor);
         }

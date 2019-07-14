@@ -10,7 +10,7 @@ namespace PokeGraphQL.GraphQL.Resources.Contests
     using System.Linq;
     using System.Threading.Tasks;
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources.Moves;
 
     internal sealed class SuperContestEffectType : BaseApiObjectType<SuperContestEffect>
@@ -32,7 +32,7 @@ namespace PokeGraphQL.GraphQL.Resources.Contests
                         .Select(move => resolver.GetMoveAsync(move.Name, token));
                     return Task.WhenAll(resourceTasks);
                 });
-            descriptor.Field(x => x.FlavorTexts)
+            descriptor.Field(x => x.FlavorTextEntries)
                 .Description("The flavor text of this contest effect listed in different languages.")
                 .Type<ListType<FlavorTextType>>();
         }

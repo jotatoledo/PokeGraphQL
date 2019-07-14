@@ -9,7 +9,7 @@ namespace PokeGraphQL.GraphQL.Resources
 {
     using System;
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources.Games;
     using PokeGraphQL.GraphQL.Resources.Machines;
 

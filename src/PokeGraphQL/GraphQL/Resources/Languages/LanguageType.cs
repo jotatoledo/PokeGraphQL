@@ -8,7 +8,7 @@
 namespace PokeGraphQL.GraphQL.Resources.Languages
 {
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
 
     internal sealed class LanguageType : BaseNamedApiObjectType<Language>
     {
@@ -16,7 +16,7 @@ namespace PokeGraphQL.GraphQL.Resources.Languages
         protected override void ConcreteConfigure(IObjectTypeDescriptor<Language> descriptor)
         {
             descriptor.Description("Languages for translations of api resource information.");
-            descriptor.Field(x => x.IsOfficial)
+            descriptor.Field(x => x.Official)
                 .Description("Whether or not the games are published in this language.");
             descriptor.Field(x => x.Iso639)
                 .Description("The two-letter code of the country where this language is spoken. Note that it is not unique.");

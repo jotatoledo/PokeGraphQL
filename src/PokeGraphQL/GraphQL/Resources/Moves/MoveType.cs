@@ -12,7 +12,7 @@ namespace PokeGraphQL.GraphQL.Resources.Moves
     using System.Threading.Tasks;
     using DotNetFunctional.Maybe;
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources.Contests;
     using PokeGraphQL.GraphQL.Resources.Games;
     using PokeGraphQL.GraphQL.Resources.Pokemons;
@@ -32,16 +32,15 @@ namespace PokeGraphQL.GraphQL.Resources.Moves
                 .Description("The percent value of how likely this move is to be successful.");
             descriptor.Field(x => x.EffectChance)
                 .Description("The percent value of how likely it is this moves effect will happen.");
-            descriptor.Field(x => x.PP)
-                .Name("pp")
+            descriptor.Field(x => x.Pp)
                 .Description("Power points. The number of times this move can be used.");
             descriptor.Field(x => x.Priority)
                 .Description("A value between -8 and 8. Sets the order in which moves are executed during battle.");
             descriptor.Field(x => x.Power)
                 .Description("The base power of this move with a value of 0 if it does not have a base power");
-            descriptor.Field(x => x.ComboSets)
+            descriptor.Field(x => x.ContestCombos)
                 .Description("A detail of normal and super contest combos that require this move.")
-                .Type<ContestComboSetType>();
+                .Type<ContestComboSetsType>();
             descriptor.Field(x => x.ContestType)
                 .Description("The type of appeal this move gives a pokémon when used in a contest.")
                 .Type<ContestTypeType>()
@@ -54,7 +53,7 @@ namespace PokeGraphQL.GraphQL.Resources.Moves
                 .Description("The type of damage the move inflicts on the target, e.g. physical.")
                 .Type<MoveDamageClassType>()
                 .Resolver((ctx, token) => ctx.Service<MoveResolver>().GetMoveDamageClassAsync(ctx.Parent<Move>().DamageClass.Name, token));
-            descriptor.Field(x => x.Effects)
+            descriptor.Field(x => x.EffectEntries)
                 .Description("The effect of this move listed in different languages.")
                 .Ignore();
             descriptor.Field(x => x.EffectChanges)
@@ -69,7 +68,7 @@ namespace PokeGraphQL.GraphQL.Resources.Moves
                 .Type<MoveMetaDataType>();
             descriptor.Field(x => x.PastValues)
                 .Description("A list of move resource value changes across ersion groups of the game.")
-                .Type<ListType<PastMoveStatValueType>>();
+                .Type<ListType<PastMoveStatValuesType>>();
             descriptor.Field(x => x.StatChanges)
                 .Description("A list of stats this moves effects and how much it effects them.")
                 .Type<ListType<MoveStatChangeType>>();
@@ -89,31 +88,29 @@ namespace PokeGraphQL.GraphQL.Resources.Moves
                 .Type<ListType<MachineVersionDetailType>>();
         }
 
-        private sealed class PastMoveStatValueType : ObjectType<PastMoveStatValue>
+        private sealed class PastMoveStatValuesType : ObjectType<PastMoveStatValues>
         {
-            protected override void Configure(IObjectTypeDescriptor<PastMoveStatValue> descriptor)
+            protected override void Configure(IObjectTypeDescriptor<PastMoveStatValues> descriptor)
             {
-                descriptor.FixStructType();
                 descriptor.Field(x => x.Accuracy)
                     .Description("The percent value of how likely this move is to be successful.");
                 descriptor.Field(x => x.EffectChance)
                     .Description("The percent value of how likely it is this moves effect will take effect.");
                 descriptor.Field(x => x.Power)
                     .Description("The base power of this move with a value of 0 if it does not have a base power.");
-                descriptor.Field(x => x.PP)
-                    .Name("pp")
+                descriptor.Field(x => x.Pp)
                     .Description("Power points. The number of times this move can be used.");
-                descriptor.Field(x => x.Effects)
+                descriptor.Field(x => x.EffectEntries)
                     .Description("The effect of this move listed in different languages.")
                     .Ignore();
                 descriptor.Field(x => x.Type)
                     .Description("The elemental type of this move.")
                     .Type<TypePropertyType>()
-                    .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetTypeAsync(ctx.Parent<PastMoveStatValue>().Type.Name, token));
+                    .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetTypeAsync(ctx.Parent<PastMoveStatValues>().Type.Name, token));
                 descriptor.Field(x => x.VersionGroup)
                     .Description("The version group in which these move stat values were in effect.")
                     .Type<VersionGroupType>()
-                    .Resolver((ctx, token) => ctx.Service<GameResolver>().GetVersionGroupAsync(ctx.Parent<PastMoveStatValue>().VersionGroup.Name, token));
+                    .Resolver((ctx, token) => ctx.Service<GameResolver>().GetVersionGroupAsync(ctx.Parent<PastMoveStatValues>().VersionGroup.Name, token));
             }
         }
 
@@ -121,7 +118,6 @@ namespace PokeGraphQL.GraphQL.Resources.Moves
         {
             protected override void Configure(IObjectTypeDescriptor<MoveStatChange> descriptor)
             {
-                descriptor.FixStructType();
                 descriptor.Field(x => x.Change)
                     .Description("The amount of change.");
                 descriptor.Field(x => x.Stat)
@@ -135,7 +131,6 @@ namespace PokeGraphQL.GraphQL.Resources.Moves
         {
             protected override void Configure(IObjectTypeDescriptor<ContestComboDetail> descriptor)
             {
-                descriptor.FixStructType();
                 descriptor.Field(x => x.UseBefore)
                     .Description("A list of moves to use before this move.")
                     .Type<ListType<MoveType>>()
@@ -161,11 +156,10 @@ namespace PokeGraphQL.GraphQL.Resources.Moves
             }
         }
 
-        private sealed class ContestComboSetType : ObjectType<ContestComboSet>
+        private sealed class ContestComboSetsType : ObjectType<ContestComboSets>
         {
-            protected override void Configure(IObjectTypeDescriptor<ContestComboSet> descriptor)
+            protected override void Configure(IObjectTypeDescriptor<ContestComboSets> descriptor)
             {
-                descriptor.FixStructType();
                 descriptor.Field(x => x.Normal)
                     .Description("A detail of moves this move can be used before or after, granting additional appeal points in contests.")
                     .Type<ContestComboDetailType>();
@@ -175,20 +169,19 @@ namespace PokeGraphQL.GraphQL.Resources.Moves
             }
         }
 
-        private sealed class MoveMetaDataType : ObjectType<MoveMetadata>
+        private sealed class MoveMetaDataType : ObjectType<MoveMetaData>
         {
             /// <inheritdoc/>
-            protected override void Configure(IObjectTypeDescriptor<MoveMetadata> descriptor)
+            protected override void Configure(IObjectTypeDescriptor<MoveMetaData> descriptor)
             {
-                descriptor.FixStructType();
                 descriptor.Field(x => x.Ailment)
                     .Description("	The status ailment this move inflicts on its target.")
                     .Type<MoveAilmentType>()
-                    .Resolver((ctx, token) => ctx.Service<MoveResolver>().GetMoveAilmentAsync(ctx.Parent<MoveMetadata>().Ailment.Name, token));
+                    .Resolver((ctx, token) => ctx.Service<MoveResolver>().GetMoveAilmentAsync(ctx.Parent<MoveMetaData>().Ailment.Name, token));
                 descriptor.Field(x => x.Category)
                     .Description("The category of move this move falls under, e.g. damage or ailment.")
                     .Type<MoveCategoryType>()
-                    .Resolver((ctx, token) => ctx.Service<MoveResolver>().GetMoveCategoryAsync(ctx.Parent<MoveMetadata>().Category.Name, token));
+                    .Resolver((ctx, token) => ctx.Service<MoveResolver>().GetMoveCategoryAsync(ctx.Parent<MoveMetaData>().Category.Name, token));
                 descriptor.Field(x => x.MinHits)
                     .Description("The minimum number of times this move hits. Null if it always only hits once.");
                 descriptor.Field(x => x.MaxHits)
@@ -197,7 +190,7 @@ namespace PokeGraphQL.GraphQL.Resources.Moves
                     .Description("The minimum number of turns this move continues to take effect. Null if it always only lasts one turn.");
                 descriptor.Field(x => x.MaxTurns)
                     .Description("The maximum number of turns this move continues to take effect. Null if it always only lasts one turn.");
-                descriptor.Field(x => x.DrainRecoil)
+                descriptor.Field(x => x.Drain)
                     .Description("HP drain (if positive) or Recoil damage (if negative), in percent of damage done.");
                 descriptor.Field(x => x.Healing)
                     .Description("The amount of hp gained by the attacking pokémon, in percent of it's maximum HP.");

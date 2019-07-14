@@ -10,7 +10,7 @@ namespace PokeGraphQL.GraphQL.Resources.Games
     using System.Linq;
     using System.Threading.Tasks;
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources.Locations;
     using PokeGraphQL.GraphQL.Resources.Pokemons;
 
@@ -24,8 +24,7 @@ namespace PokeGraphQL.GraphQL.Resources.Games
             and some smaller dexes related to portions of a region.");
             descriptor.Field(x => x.IsMainSeries)
                 .Description("Whether or not this pokédex originated in the main series of the video games.");
-            descriptor.Field(x => x.Entries)
-                .Name("pokemonEntries")
+            descriptor.Field(x => x.PokemonEntries)
                 .Description("A list of pokémon catalogued in this pokédex  and their indexes.")
                 .Type<ListType<PokemonEntryType>>();
             descriptor.Field(x => x.Region)
@@ -54,13 +53,12 @@ namespace PokeGraphQL.GraphQL.Resources.Games
         {
             protected override void Configure(IObjectTypeDescriptor<PokemonEntry> descriptor)
             {
-                descriptor.FixStructType();
                 descriptor.Field(x => x.EntryNumber)
                     .Description("The index of this pokémon species entry within the pokédex.");
-                descriptor.Field(x => x.Species)
+                descriptor.Field(x => x.PokemonSpecies)
                     .Description("The pokémon species being encountered.")
                     .Type<PokemonSpeciesType>()
-                    .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetPokemonSpeciesAsync(ctx.Parent<PokemonEntry>().Species.Name, token));
+                    .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetPokemonSpeciesAsync(ctx.Parent<PokemonEntry>().PokemonSpecies.Name, token));
             }
         }
     }

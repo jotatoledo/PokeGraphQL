@@ -10,7 +10,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
     using System.Linq;
     using System.Threading.Tasks;
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
 
     internal sealed class EggGroupType : BaseNamedApiObjectType<EggGroup>
     {
@@ -19,14 +19,14 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
         {
             descriptor.Description(@"Egg Groups are categories which determine which Pokémon are able to interbreed. 
                 Pokémon may belong to either one or two Egg Groups.");
-            descriptor.Field(x => x.Species)
+            descriptor.Field(x => x.PokemonSpecies)
                 .Description("A list of all pokémon species that are members of this egg group.")
                 .Type<ListType<PokemonSpeciesType>>()
                 .Resolver((ctx, token) =>
                 {
                     var resolver = ctx.Service<PokemonResolver>();
                     var resourceTasks = ctx.Parent<EggGroup>()
-                        .Species
+                        .PokemonSpecies
                         .Select(species => resolver.GetPokemonSpeciesAsync(species.Name, token));
                     return Task.WhenAll(resourceTasks);
                 });

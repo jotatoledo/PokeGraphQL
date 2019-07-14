@@ -8,7 +8,7 @@
 namespace PokeGraphQL.GraphQL.Resources.Pokemons
 {
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources.Games;
 
     internal sealed class AbilityType : BaseNamedApiObjectType<Ability>
@@ -24,7 +24,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
                 .Description("The generation this ability originated in.")
                 .Type<GenerationType>()
                 .Resolver((ctx, token) => ctx.Service<GameResolver>().GetGenerationAsync(ctx.Parent<Ability>().Generation.Name, token));
-            descriptor.Field(x => x.Effects)
+            descriptor.Field(x => x.EffectEntries)
                 .Description("The effect of this ability listed in different languages.")
                 .Type<ListType<VerboseEffectType>>();
             descriptor.Field(x => x.EffectChanges)
@@ -33,7 +33,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
             descriptor.Field(x => x.Pokemon)
                 .Description("A list of pokémon that could potentially have this ability.")
                 .Type<ListType<AbilityPokemonType>>();
-            descriptor.Field(x => x.FlavorTexts)
+            descriptor.Field(x => x.FlavorTextEntries)
                 .Description("The flavor text of this ability listed in different languages")
                 .Type<ListType<VersionGroupFlavorTextType>>();
         }
@@ -42,7 +42,6 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
         {
             protected override void Configure(IObjectTypeDescriptor<AbilityPokemon> descriptor)
             {
-                descriptor.FixStructType();
                 descriptor.Field(x => x.IsHidden)
                     .Description("Whether or not this a hidden ability for the referenced pokémon.");
                 descriptor.Field(x => x.Slot)

@@ -8,7 +8,7 @@
 namespace PokeGraphQL.GraphQL.Resources.Pokemons
 {
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
 
     internal sealed class CharacteristicType : BaseApiObjectType<Characteristic>
     {
@@ -22,11 +22,14 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
             descriptor.Field(x => x.PossibleValues)
                 .Description("The possible values of the highest stat that would result in a pokémon recieving this characteristic when divided by 5.")
                 .Type<ListType<IntType>>();
-            descriptor.Field(x => x.HighestStat)
-                .Description("The highest stat of this characteristic")
-                .Type<StatType>()
-                .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetStatAsync(ctx.Parent<Characteristic>().HighestStat.Name, token));
-            descriptor.Ignore(x => x.Descriptions);
+
+            // TODO missing properties, report in upstream
+            // See https://pokeapi.co/api/v2/characteristic/1
+            //descriptor.Field(x => x.HighestStat)
+            //    .Description("The highest stat of this characteristic")
+            //    .Type<StatType>()
+            //    .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetStatAsync(ctx.Parent<Characteristic>().HighestStat.Name, token));
+            //descriptor.Ignore(x => x.Descriptions);
         }
     }
 }

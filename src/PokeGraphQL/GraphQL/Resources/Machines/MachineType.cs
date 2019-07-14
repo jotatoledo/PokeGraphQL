@@ -8,7 +8,7 @@
 namespace PokeGraphQL.GraphQL.Resources.Machines
 {
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources.Games;
     using PokeGraphQL.GraphQL.Resources.Items;
     using PokeGraphQL.GraphQL.Resources.Moves;

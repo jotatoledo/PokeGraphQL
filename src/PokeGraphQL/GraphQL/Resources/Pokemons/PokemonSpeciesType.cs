@@ -11,7 +11,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
     using System.Linq;
     using System.Threading.Tasks;
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources.Evolutions;
     using PokeGraphQL.GraphQL.Resources.Games;
     using PokeGraphQL.GraphQL.Resources.Languages;
@@ -25,12 +25,11 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
             descriptor.Description(@"A Pokémon Species forms the basis for at least one pokémon. 
                 Attributes of a Pokémon species are shared across all varieties of pokémon within the species. 
                 A good example is Wormadam; Wormadam is the species which can be found in three different varieties, Wormadam-Trash, Wormadam-Sandy and Wormadam-Plant.");
-            descriptor.Ignore(x => x.Descriptions);
+            descriptor.Ignore(x => x.FormDescriptions);
             descriptor.Field(x => x.Order)
                 .Description(@"The order in which species should be sorted.
                     Based on National Dex order, except families are grouped together and sorted by stage.");
-            descriptor.Field(x => x.FemaleToMaleRate)
-                .Name("genderRate")
+            descriptor.Field(x => x.GenderRate)
                 .Description("The chance of this Pokémon being female, in eighths; or -1 for genderless.");
             descriptor.Field(x => x.CaptureRate)
                 .Description("The base capture rate; up to 255. The higher the number, the easier the catch.");
@@ -42,7 +41,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
                 .Description("Initial hatch counter: one must walk 255 × (hatch_counter + 1) steps before this Pokémon's egg hatches, unless utilizing bonuses like Flame Body's.");
             descriptor.Field(x => x.HasGenderDifferences)
                 .Description("Whether or not this pokémon can have different genders.");
-            descriptor.Field(x => x.FormsAreSwitchable)
+            descriptor.Field(x => x.FormsSwitchable)
                 .Description("Whether or not this pokémon has multiple forms and can switch between them.");
             descriptor.Field(x => x.GrowthRate)
                 .Description("The rate at which this pokémon species gains levels.")
@@ -62,10 +61,10 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
                         .Select(eggGroup => resolver.GetEggGroupAsync(eggGroup.Name, token));
                     return Task.WhenAll(resourceTasks);
                 });
-            descriptor.Field(x => x.Colours)
+            descriptor.Field(x => x.Color)
                 .Description("The color of this pokémon for gimmicky pokedex search.")
                 .Type<PokemonColorType>()
-                .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetPokemonColorAsync(ctx.Parent<PokemonSpecies>().Colours.Name, token));
+                .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetPokemonColorAsync(ctx.Parent<PokemonSpecies>().Color.Name, token));
             descriptor.Field(x => x.Shape)
                 .Description("The shape of this pokémon for gimmicky pokedex search.")
                 .Type<PokemonShapeType>()
@@ -95,33 +94,17 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
             descriptor.Field(x => x.Varieties)
                 .Description("A list of the pokémon that exist within this pokémon species.")
                 .Type<ListType<PokemonSpeciesVarietyType>>();
-            descriptor.Field(x => x.FlavorTexts)
-                .Type<ListType<PokemonSpeciesFlavorTextType>>();
-        }
 
-        private sealed class PokemonSpeciesFlavorTextType : ObjectType<PokemonSpeciesFlavorText>
-        {
-            protected override void Configure(IObjectTypeDescriptor<PokemonSpeciesFlavorText> descriptor)
-            {
-                descriptor.FixStructType();
-                descriptor.Field(x => x.FlavorText)
-                    .Name("text")
-                    .Description("The text the flavor resource.");
-                descriptor.Field(x => x.Version)
-                    .Type<VersionType>()
-                    .Resolver((ctx, token) => ctx.Service<GameResolver>().GetVersionAsync(ctx.Parent<PokemonSpeciesFlavorText>().Version.Name, token));
-                descriptor.Field(x => x.Language)
-                    .Description("The language this text is in.")
-                    .Type<LanguageType>()
-                    .Resolver((ctx, token) => ctx.Service<LanguageResolver>().GetLanguageAsync(ctx.Parent<PokemonSpeciesFlavorText>().Language.Name, token));
-            }
+            // TODO type should be changed in upstream to {version,language,flavor_text}[]; FlavorTexts is only {flavor_text, language}
+            // See https://pokeapi.co/api/v2/pokemon-species/1
+            descriptor.Field(x => x.FlavorTextEntries)
+                .Type<ListType<FlavorTextType>>();
         }
 
         private sealed class PokemonSpeciesVarietyType : ObjectType<PokemonSpeciesVariety>
         {
             protected override void Configure(IObjectTypeDescriptor<PokemonSpeciesVariety> descriptor)
             {
-                descriptor.FixStructType();
                 descriptor.Field(x => x.IsDefault);
                 descriptor.Field(x => x.Pokemon)
                     .Type<PokemonType>()
@@ -133,7 +116,6 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
         {
             protected override void Configure(IObjectTypeDescriptor<PokemonSpeciesDexEntry> descriptor)
             {
-                descriptor.FixStructType();
                 descriptor.Field(x => x.EntryNumber)
                     .Description("The index number within the pokédex.");
                 descriptor.Field(x => x.Pokedex)
@@ -143,17 +125,16 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
             }
         }
 
-        private sealed class GenusType : ObjectType<Genus>
+        private sealed class GenusType : ObjectType<Genuses>
         {
-            protected override void Configure(IObjectTypeDescriptor<Genus> descriptor)
+            protected override void Configure(IObjectTypeDescriptor<Genuses> descriptor)
             {
-                descriptor.FixStructType();
-                descriptor.Field(x => x.Name)
+                descriptor.Field(x => x.Genus)
                     .Description("The localized genus for the referenced pokémon species.");
                 descriptor.Field(x => x.Language)
                     .Description("The language this genus is in.")
                     .Type<LanguageType>()
-                    .Resolver((ctx, token) => ctx.Service<LanguageResolver>().GetLanguageAsync(ctx.Parent<Genus>().Language.Name, token));
+                    .Resolver((ctx, token) => ctx.Service<LanguageResolver>().GetLanguageAsync(ctx.Parent<Genuses>().Language.Name, token));
             }
         }
 

@@ -10,7 +10,7 @@ namespace PokeGraphQL.GraphQL.Resources.Moves
     using System.Linq;
     using System.Threading.Tasks;
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources.Games;
 
     internal sealed class MoveLearnMethodType : BaseNamedApiObjectType<MoveLearnMethod>

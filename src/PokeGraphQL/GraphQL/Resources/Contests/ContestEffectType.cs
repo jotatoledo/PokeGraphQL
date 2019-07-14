@@ -8,7 +8,7 @@
 namespace PokeGraphQL.GraphQL.Resources.Contests
 {
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
 
     internal sealed class ContestEffectType : BaseApiObjectType<ContestEffect>
     {
@@ -20,10 +20,10 @@ namespace PokeGraphQL.GraphQL.Resources.Contests
                 .Description("The base number of hearts the user of this move gets.");
             descriptor.Field(x => x.Jam)
                 .Description("The base number of hearts the user's opponent loses.");
-            descriptor.Field(x => x.Effects)
+            descriptor.Field(x => x.EffectEntries)
                 .Description("The result of this contest effect listed in different languages.")
-                .Type<ListType<EffectType>>();
-            descriptor.Field(x => x.FlavorTexts)
+                .Type<ListType<EffectsType>>();
+            descriptor.Field(x => x.FlavorTextEntries)
                 .Description("The flavor text of this contest effect listed in different languages.")
                 .Type<ListType<FlavorTextType>>();
         }

@@ -10,7 +10,7 @@ namespace PokeGraphQL.GraphQL.Resources.Berries
     using System.Linq;
     using System.Threading.Tasks;
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
 
     internal sealed class BerryFirmnessType : BaseNamedApiObjectType<BerryFirmness>
     {

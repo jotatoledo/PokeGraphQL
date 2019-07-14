@@ -10,7 +10,7 @@ namespace PokeGraphQL.GraphQL.Resources.Games
     using System.Linq;
     using System.Threading.Tasks;
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources.Locations;
     using PokeGraphQL.GraphQL.Resources.Moves;
     using PokeGraphQL.GraphQL.Resources.Pokemons;
@@ -48,7 +48,7 @@ namespace PokeGraphQL.GraphQL.Resources.Games
                         .Select(move => resolver.GetMoveAsync(move.Name, token));
                     return Task.WhenAll(resourceTasks);
                 });
-            descriptor.Field(x => x.Species)
+            descriptor.Field(x => x.PokemonSpecies)
                 .Name("pokemonSpecies")
                 .Description("A list of pokémon species that were introduced in this generation.")
                 .Type<ListType<PokemonSpeciesType>>()
@@ -56,7 +56,7 @@ namespace PokeGraphQL.GraphQL.Resources.Games
                 {
                     var resolver = ctx.Service<PokemonResolver>();
                     var resourceTasks = ctx.Parent<Generation>()
-                        .Species
+                        .PokemonSpecies
                         .Select(species => resolver.GetPokemonSpeciesAsync(species.Name, token));
                     return Task.WhenAll(resourceTasks);
                 });

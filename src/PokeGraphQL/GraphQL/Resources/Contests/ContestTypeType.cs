@@ -8,7 +8,7 @@
 namespace PokeGraphQL.GraphQL.Resources.Contests
 {
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources.Berries;
 
     internal sealed class ContestTypeType : BaseApiObjectType<ContestType>

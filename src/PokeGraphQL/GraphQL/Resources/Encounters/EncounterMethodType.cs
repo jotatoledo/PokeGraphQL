@@ -8,7 +8,7 @@
 namespace PokeGraphQL.GraphQL.Resources.Encounters
 {
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
 
     internal sealed class EncounterMethodType : BaseNamedApiObjectType<EncounterMethod>
     {

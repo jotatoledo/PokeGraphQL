@@ -10,7 +10,7 @@ namespace PokeGraphQL.GraphQL.Resources.Games
     using System.Linq;
     using System.Threading.Tasks;
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources.Locations;
     using PokeGraphQL.GraphQL.Resources.Moves;
 
@@ -37,15 +37,14 @@ namespace PokeGraphQL.GraphQL.Resources.Games
                         .Select(learnMethod => resolver.GetMoveLearnMethodAsync(learnMethod.Name, token));
                     return Task.WhenAll(resourceTasks);
                 });
-            descriptor.Field(x => x.Pokedices)
-                .Name("pokedexes")
+            descriptor.Field(x => x.Pokedexes)
                 .Description("A list of pokedexes introduced in this version group.")
                 .Type<ListType<PokedexType>>()
                 .Resolver((ctx, token) =>
                 {
                     var resolver = ctx.Service<GameResolver>();
                     var resourceTasks = ctx.Parent<VersionGroup>()
-                        .Pokedices
+                        .Pokedexes
                         .Select(pokedex => resolver.GetPokedexAsync(pokedex.Name, token));
                     return Task.WhenAll(resourceTasks);
                 });

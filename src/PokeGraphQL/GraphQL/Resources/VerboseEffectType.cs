@@ -8,7 +8,7 @@
 namespace PokeGraphQL.GraphQL.Resources
 {
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources.Languages;
 
     internal sealed class VerboseEffectType : ObjectType<VerboseEffect>
@@ -16,7 +16,6 @@ namespace PokeGraphQL.GraphQL.Resources
         /// <inheritdoc/>
         protected override void Configure(IObjectTypeDescriptor<VerboseEffect> descriptor)
         {
-            descriptor.FixStructType();
             descriptor.Field(x => x.Effect)
                 .Description("The localized effect text for an api resource in a specific language.");
             descriptor.Field(x => x.ShortEffect)

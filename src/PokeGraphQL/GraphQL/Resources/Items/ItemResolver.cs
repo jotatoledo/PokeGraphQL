@@ -9,18 +9,26 @@ namespace PokeGraphQL.GraphQL.Resources.Items
 {
     using System.Threading;
     using System.Threading.Tasks;
-    using PokeAPI;
+    using PokeApiNet.Data;
+    using PokeApiNet.Models;
 
     public class ItemResolver
     {
-        public virtual async Task<Item> GetItemAsync(string nameOrId, CancellationToken cancellationToken = default) => await DataFetcher.GetNamedApiObject<Item>(nameOrId).ConfigureAwait(false);
+        private readonly PokeApiClient pokeApiClient;
 
-        public virtual async Task<ItemAttribute> GetAttributeAsync(string nameOrId, CancellationToken cancellationToken = default) => await DataFetcher.GetNamedApiObject<ItemAttribute>(nameOrId).ConfigureAwait(false);
+        public ItemResolver(PokeApiClient pokeApiClient)
+        {
+            this.pokeApiClient = pokeApiClient;
+        }
 
-        public virtual async Task<ItemCategory> GetCategoryAsync(string nameOrId, CancellationToken cancellationToken = default) => await DataFetcher.GetNamedApiObject<ItemCategory>(nameOrId).ConfigureAwait(false);
+        public virtual async Task<Item> GetItemAsync(string nameOrId, CancellationToken cancellationToken = default) => await this.pokeApiClient.GetResourceFromParamAsync<Item>(nameOrId).ConfigureAwait(false);
 
-        public virtual async Task<ItemPocket> GetPocketAsync(string nameOrId, CancellationToken token = default) => await DataFetcher.GetNamedApiObject<ItemPocket>(nameOrId).ConfigureAwait(false);
+        public virtual async Task<ItemAttribute> GetAttributeAsync(string nameOrId, CancellationToken cancellationToken = default) => await this.pokeApiClient.GetResourceFromParamAsync<ItemAttribute>(nameOrId).ConfigureAwait(false);
 
-        public virtual async Task<ItemFlingEffect> GetFlingEffectAsync(string nameOrId, CancellationToken token = default) => await DataFetcher.GetNamedApiObject<ItemFlingEffect>(nameOrId).ConfigureAwait(false);
+        public virtual async Task<ItemCategory> GetCategoryAsync(string nameOrId, CancellationToken cancellationToken = default) => await this.pokeApiClient.GetResourceFromParamAsync<ItemCategory>(nameOrId).ConfigureAwait(false);
+
+        public virtual async Task<ItemPocket> GetPocketAsync(string nameOrId, CancellationToken token = default) => await this.pokeApiClient.GetResourceFromParamAsync<ItemPocket>(nameOrId).ConfigureAwait(false);
+
+        public virtual async Task<ItemFlingEffect> GetFlingEffectAsync(string nameOrId, CancellationToken token = default) => await this.pokeApiClient.GetResourceFromParamAsync<ItemFlingEffect>(nameOrId).ConfigureAwait(false);
     }
 }

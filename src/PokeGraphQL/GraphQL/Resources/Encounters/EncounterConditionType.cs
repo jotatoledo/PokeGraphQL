@@ -10,7 +10,7 @@ namespace PokeGraphQL.GraphQL.Resources.Encounters
     using System.Linq;
     using System.Threading.Tasks;
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
 
     internal sealed class EncounterConditionType : BaseNamedApiObjectType<EncounterCondition>
     {
@@ -25,8 +25,8 @@ namespace PokeGraphQL.GraphQL.Resources.Encounters
                 {
                     var service = ctx.Service<EncounterResolver>();
                     var resourceTasks = ctx.Parent<EncounterCondition>()
-                    .Values
-                    .Select(value => service.GetEncounterConditionValueAsync(value.Name, token));
+                        .Values
+                        .Select(value => service.GetEncounterConditionValueAsync(value.Name, token));
                     return Task.WhenAll(resourceTasks);
                 });
         }

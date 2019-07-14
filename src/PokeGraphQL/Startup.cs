@@ -8,6 +8,7 @@
 namespace PokeGraphQL
 {
     using System;
+    using System.Net.Http;
     using HotChocolate.AspNetCore;
     using HotChocolate.AspNetCore.GraphiQL;
     using HotChocolate.AspNetCore.Voyager;
@@ -17,6 +18,7 @@ namespace PokeGraphQL
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
+    using PokeApiNet.Data;
     using PokeGraphQL.GraphQL;
 
     public class Startup
@@ -36,6 +38,14 @@ namespace PokeGraphQL
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddHotChocolate();
+            services.AddSingleton<PokeApiClient>();
+            services.AddScoped(s =>
+            {
+                // TODO clean up
+                var client = new HttpClient();
+                client.DefaultRequestHeaders.UserAgent.ParseAdd("PokegraphQL (https://github.com/jotatoledo/PokeGraphQL)");
+                return client;
+            });
 
             if (string.Equals(this.Configuration.GetValue<string>("ASPNETCORE_HSTS_ENABLED"), "true", StringComparison.OrdinalIgnoreCase))
             {

@@ -9,14 +9,22 @@ namespace PokeGraphQL.GraphQL.Resources.Contests
 {
     using System.Threading;
     using System.Threading.Tasks;
-    using PokeAPI;
+    using PokeApiNet.Data;
+    using PokeApiNet.Models;
 
     public class ContestResolver
     {
-        public virtual async Task<ContestType> GetContestTypeAsync(string nameOrId, CancellationToken cancellationToken = default) => await DataFetcher.GetNamedApiObject<ContestType>(nameOrId).ConfigureAwait(false);
+        private readonly PokeApiClient pokeApiClient;
 
-        public virtual async Task<ContestEffect> GetContestEffectAsync(int id, CancellationToken cancellationToken = default) => await DataFetcher.GetApiObject<ContestEffect>(id).ConfigureAwait(false);
+        public ContestResolver(PokeApiClient pokeApiClient)
+        {
+            this.pokeApiClient = pokeApiClient;
+        }
 
-        public virtual async Task<SuperContestEffect> GetSuperContestEffectAsync(int id, CancellationToken cancellationToken = default) => await DataFetcher.GetApiObject<SuperContestEffect>(id).ConfigureAwait(false);
+        public virtual async Task<ContestType> GetContestTypeAsync(string nameOrId, CancellationToken cancellationToken = default) => await this.pokeApiClient.GetResourceFromParamAsync<ContestType>(nameOrId).ConfigureAwait(false);
+
+        public virtual async Task<ContestEffect> GetContestEffectAsync(int id, CancellationToken cancellationToken = default) => await this.pokeApiClient.GetResourceAsync<ContestEffect>(id).ConfigureAwait(false);
+
+        public virtual async Task<SuperContestEffect> GetSuperContestEffectAsync(int id, CancellationToken cancellationToken = default) => await this.pokeApiClient.GetResourceAsync<SuperContestEffect>(id).ConfigureAwait(false);
     }
 }

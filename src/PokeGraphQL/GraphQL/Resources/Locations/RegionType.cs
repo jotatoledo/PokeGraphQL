@@ -10,7 +10,7 @@ namespace PokeGraphQL.GraphQL.Resources.Locations
     using System.Linq;
     using System.Threading.Tasks;
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources.Games;
 
     internal sealed class RegionType : BaseNamedApiObjectType<Region>
@@ -35,7 +35,7 @@ namespace PokeGraphQL.GraphQL.Resources.Locations
                 .Description("The generation this region was introduced in.")
                 .Type<GenerationType>()
                 .Resolver((ctx, token) => ctx.Service<GameResolver>().GetGenerationAsync(ctx.Parent<Region>().MainGeneration.Name, token));
-            descriptor.Field(x => x.Pokedices)
+            descriptor.Field(x => x.Pokedexes)
                 .Name("pokedexes")
                 .Description("A list of pokédexes that catalogue pokemon in this region.")
                 .Type<ListType<PokedexType>>()
@@ -43,7 +43,7 @@ namespace PokeGraphQL.GraphQL.Resources.Locations
                 {
                     var resolver = ctx.Service<GameResolver>();
                     var resourceTasks = ctx.Parent<Region>()
-                        .Pokedices
+                        .Pokedexes
                         .Select(pokedex => resolver.GetPokedexAsync(pokedex.Name, token));
                     return Task.WhenAll(resourceTasks);
                 });

@@ -8,21 +8,20 @@
 namespace PokeGraphQL.GraphQL.Resources
 {
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources.Languages;
 
-    internal sealed class EffectType : ObjectType<Effect>
+    internal sealed class EffectsType : ObjectType<Effects>
     {
         /// <inheritdoc/>
-        protected override void Configure(IObjectTypeDescriptor<Effect> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<Effects> descriptor)
         {
-            descriptor.FixStructType();
-            descriptor.Field(x => x.Text)
+            descriptor.Field(x => x.Effect)
                 .Description("The localized effect text for an api resource in a specific language.");
             descriptor.Field(x => x.Language)
                 .Description("The language this effect is in.")
                 .Type<LanguageType>()
-                .Resolver((ctx, token) => ctx.Service<LanguageResolver>().GetLanguageAsync(ctx.Parent<Effect>().Language.Name, token));
+                .Resolver((ctx, token) => ctx.Service<LanguageResolver>().GetLanguageAsync(ctx.Parent<Effects>().Language.Name, token));
         }
     }
 }
