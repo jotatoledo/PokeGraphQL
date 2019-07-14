@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="DotNetFunctional.Maybe" Version="1.0.1" />
+    <PackageReference Include="DotNetFunctional.Maybe" Version="1.1.0" />
     <PackageReference Include="HotChocolate" Version="9.0.4" />
     <PackageReference Include="HotChocolate.AspNetCore" Version="9.0.4" />
     <PackageReference Include="HotChocolate.AspNetCore.GraphiQL" Version="9.0.4" />
