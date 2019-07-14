@@ -74,7 +74,7 @@ namespace PokeGraphQL
                 .UseXContentTypeOptions()
                 .UseReferrerPolicy(options => options.StrictOriginWhenCrossOrigin())
                 .UseCsp(options => options
-                    .DefaultSources(s => s.Self())
+                    .DefaultSources(s => s.None())
                     .ScriptSources(s => s.Self().UnsafeInline())
                     .StyleSources(s => s.Self().UnsafeInline())
                     .ObjectSources(s => s.None())
@@ -83,7 +83,11 @@ namespace PokeGraphQL
                     .FrameSources(s => s.None())
                     .FontSources(s => s.None())
                     .ConnectSources(s => s.Self())
-                    .WorkerSources(s => s.Self().CustomSources("blob:")));
+                    .BaseUris(s => s.None())
+                    .FrameAncestors(s => s.None())
+                    .FormActions(s => s.None())
+                    .WorkerSources(s => s.Self().CustomSources("blob:"))
+                    .ManifestSources(s => s.None()));
 
             app.UseGraphQL("/graphql")
                 .UseGraphiQL(new GraphiQLOptions
