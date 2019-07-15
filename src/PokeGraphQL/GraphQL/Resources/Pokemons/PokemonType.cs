@@ -81,7 +81,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
             {
                 descriptor.Field(x => x.LocationArea)
                     .Type<LocationAreaType>()
-                    .Resolver((ctx, token) => ctx.Service<LocationResolver>().GetLocationAreaAsync(Convert.ToInt32(ctx.Parent<LocationAreaEncounter>().LocationArea.Url.LastSegment()), token));
+                    .Resolver((ctx, token) => ctx.Service<LocationResolver>().GetLocationAreaAsync(ctx.Parent<LocationAreaEncounter>().LocationArea.Name, token));
                 descriptor.Field(x => x.VersionDetails)
                     .Type<ListType<VersionEncounterDetailType>>();
             }

@@ -23,7 +23,7 @@ namespace PokeGraphQL.GraphQL.Resources.Locations
 
         public virtual async Task<Location> GetLocationAsync(string nameOrId, CancellationToken cancellationToken = default) => await this.pokeApiClient.GetResourceFromParamAsync<Location>(nameOrId).ConfigureAwait(false);
 
-        public virtual async Task<LocationArea> GetLocationAreaAsync(int id, CancellationToken cancellationToken = default) => await this.pokeApiClient.GetResourceAsync<LocationArea>(id).ConfigureAwait(false);
+        public virtual async Task<LocationArea> GetLocationAreaAsync(string nameOrId, CancellationToken cancellationToken = default) => await this.pokeApiClient.GetResourceFromParamAsync<LocationArea>(nameOrId).ConfigureAwait(false);
 
         public virtual async Task<PalParkArea> GetPalParkAreaAsync(string nameOrId, CancellationToken cancellationToken = default) => await this.pokeApiClient.GetResourceFromParamAsync<PalParkArea>(nameOrId).ConfigureAwait(false);
 

@@ -35,7 +35,7 @@ namespace PokeGraphQL.GraphQL.Resources.Locations
                     var resolver = ctx.Service<LocationResolver>();
                     var resourceTasks = ctx.Parent<Location>()
                         .Areas
-                        .Select(area => resolver.GetLocationAreaAsync(Convert.ToInt32(area.Url.LastSegment()), token));
+                        .Select(area => resolver.GetLocationAreaAsync(area.Name, token));
                     return Task.WhenAll(resourceTasks);
                 });
         }
