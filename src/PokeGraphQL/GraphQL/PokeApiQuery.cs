@@ -50,7 +50,7 @@ namespace PokeGraphQL.GraphQL
 
         private static void RegisterLanguageResources(IObjectTypeDescriptor descriptor)
         {
-            descriptor.Field("berry")
+            descriptor.Field("language")
                 .Type<LanguageType>()
                 .Argument("nameOrId", a => a.Type<StringType>().Description("The identifier or name for the resource."))
                 .Resolver((ctx, token) => ctx.Service<LanguageResolver>().GetLanguageAsync(ctx.Argument<string>("nameOrId"), token));
