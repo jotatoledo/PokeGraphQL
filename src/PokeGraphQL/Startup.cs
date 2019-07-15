@@ -39,9 +39,9 @@ namespace PokeGraphQL
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddHotChocolate();
             services.AddSingleton<PokeApiClient>();
-            services.AddScoped(s =>
+            services.AddSingleton(s =>
             {
-                // TODO clean up
+                // TODO clean up, add app version
                 var client = new HttpClient();
                 client.DefaultRequestHeaders.UserAgent.ParseAdd("PokegraphQL (https://github.com/jotatoledo/PokeGraphQL)");
                 return client;

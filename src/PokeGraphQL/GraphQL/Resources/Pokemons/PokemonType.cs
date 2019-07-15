@@ -136,7 +136,6 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
                 descriptor.Field(x => x.VersionDetails)
                     .Description("Details on chance of the pokemon having the item based on version.")
                     .Type<ListType<HeldItemVersionDetailsType>>();
-
             }
         }
 

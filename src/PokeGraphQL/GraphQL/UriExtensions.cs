@@ -11,11 +11,10 @@ namespace PokeGraphQL.GraphQL
     using System.Linq;
 
     /// <summary>
-    /// Provides commodity extenion methods to <see cref="Uri"/> and <see cref="string"/>
+    /// Provides commodity extenion methods to <see cref="Uri"/> and <see cref="string"/>.
     /// </summary>
     internal static class UriExtensions
     {
-
         /// <summary>
         /// Extracts the last segment in an absolute path.
         /// </summary>

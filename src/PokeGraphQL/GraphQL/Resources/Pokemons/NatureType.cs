@@ -18,7 +18,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
         protected override void ConcreteConfigure(IObjectTypeDescriptor<Nature> descriptor)
         {
             descriptor.Description("Natures influence how a pokémon's stats grow.");
-            
+
             // TODO fix typo in upstream
             descriptor.Field(x => x.DescreasedStat)
                 .Name("decreasedStat")
