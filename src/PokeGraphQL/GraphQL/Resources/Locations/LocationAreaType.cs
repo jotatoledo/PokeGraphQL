@@ -8,7 +8,8 @@
 namespace PokeGraphQL.GraphQL.Resources.Locations
 {
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
+    using PokeGraphQL.GraphQL.Resources.Common;
     using PokeGraphQL.GraphQL.Resources.Encounters;
     using PokeGraphQL.GraphQL.Resources.Games;
     using PokeGraphQL.GraphQL.Resources.Pokemons;
@@ -27,11 +28,11 @@ namespace PokeGraphQL.GraphQL.Resources.Locations
                 .Description(@"A list of methods in which pokémon may be encountered in this area 
                     and how likely the method will occur depending on the version of the game.")
                 .Type<ListType<EncounterMethodRateType>>();
-            descriptor.Field(x => x.Region)
-                .Description("he region this location can be found in")
-                .Type<RegionType>()
-                .Resolver((ctx, token) => ctx.Service<LocationResolver>().GetRegionAsync(ctx.Parent<LocationArea>().Region.Name, token));
-            descriptor.Field(x => x.Encounters)
+            descriptor.Field(x => x.Location)
+                .Description("The region this location can be found in")
+                .Type<LocationType>()
+                .Resolver((ctx, token) => ctx.Service<LocationResolver>().GetLocationAsync(ctx.Parent<LocationArea>().Location.Name, token));
+            descriptor.Field(x => x.PokemonEncounters)
                 .Description("A list of pokémon that can be encountered in this area along with version specific details about the encounter.")
                 .Type<ListType<PokemonEncounterType>>();
         }
@@ -40,7 +41,6 @@ namespace PokeGraphQL.GraphQL.Resources.Locations
         {
             protected override void Configure(IObjectTypeDescriptor<PokemonEncounter> descriptor)
             {
-                descriptor.FixStructType();
                 descriptor.Field(x => x.Pokemon)
                     .Description("The pokémon being encountered.")
                     .Type<PokemonType>()
@@ -55,7 +55,6 @@ namespace PokeGraphQL.GraphQL.Resources.Locations
         {
             protected override void Configure(IObjectTypeDescriptor<EncounterVersionDetails> descriptor)
             {
-                descriptor.FixStructType();
                 descriptor.Field(x => x.Rate)
                     .Description("The chance of an encounter to occur.");
                 descriptor.Field(x => x.Version)
@@ -68,7 +67,6 @@ namespace PokeGraphQL.GraphQL.Resources.Locations
         {
             protected override void Configure(IObjectTypeDescriptor<EncounterMethodRate> descriptor)
             {
-                descriptor.FixStructType();
                 descriptor.Field(x => x.EncounterMethod)
                     .Description("The method in which pokémon may be encountered in an area.")
                     .Type<EncounterMethodType>()

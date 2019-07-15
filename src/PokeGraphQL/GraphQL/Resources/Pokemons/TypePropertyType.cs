@@ -8,15 +8,17 @@
 namespace PokeGraphQL.GraphQL.Resources.Pokemons
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using HotChocolate.Resolvers;
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
+    using PokeGraphQL.GraphQL.Resources.Common;
     using PokeGraphQL.GraphQL.Resources.Games;
     using PokeGraphQL.GraphQL.Resources.Moves;
-    using TypeProperty = PokeAPI.PokemonType;
+    using TypeProperty = PokeApiNet.Models.Type;
 
     internal sealed class TypePropertyType : BaseNamedApiObjectType<TypeProperty>
     {
@@ -60,7 +62,6 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
         {
             protected override void Configure(IObjectTypeDescriptor<TypeRelations> descriptor)
             {
-                descriptor.FixStructType();
                 descriptor.Field(x => x.NoDamageTo)
                     .Description("A list of types this type has no effect on.")
                     .Type<ListType<TypePropertyType>>()
@@ -87,7 +88,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
                     .Resolver(CreateResolver(source => source.DoubleDamageFrom));
             }
 
-            private static Func<IResolverContext, CancellationToken, Task<TypeProperty[]>> CreateResolver(Func<TypeRelations, NamedApiResource<TypeProperty>[]> selector)
+            private static Func<IResolverContext, CancellationToken, Task<TypeProperty[]>> CreateResolver(Func<TypeRelations, List<NamedApiResource<TypeProperty>>> selector)
             => (ctx, token) =>
             {
                 var resolver = ctx.Service<PokemonResolver>();
@@ -101,7 +102,6 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
         {
             protected override void Configure(IObjectTypeDescriptor<TypePokemon> descriptor)
             {
-                descriptor.FixStructType();
                 descriptor.Field(x => x.Slot)
                     .Description("The order the pokemons types are listed in.");
                 descriptor.Field(x => x.Pokemon)

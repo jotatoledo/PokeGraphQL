@@ -10,7 +10,8 @@ namespace PokeGraphQL.GraphQL.Resources.Items
     using System.Linq;
     using System.Threading.Tasks;
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
+    using PokeGraphQL.GraphQL.Resources.Common;
 
     internal sealed class ItemFlingEffectType : BaseNamedApiObjectType<ItemFlingEffect>
     {
@@ -18,9 +19,9 @@ namespace PokeGraphQL.GraphQL.Resources.Items
         protected override void ConcreteConfigure(IObjectTypeDescriptor<ItemFlingEffect> descriptor)
         {
             descriptor.Description("The various effects of the move \"Fling\" when used with different items.");
-            descriptor.Field(x => x.Effects)
+            descriptor.Field(x => x.EffectEntries)
                 .Description("The result of this fling effect listed in different languages.")
-                .Type<ListType<EffectType>>();
+                .Type<ListType<EffectsType>>();
             descriptor.Field(x => x.Items)
                 .Description("A list of items that have this fling effect.")
                 .Type<ListType<ItemType>>()

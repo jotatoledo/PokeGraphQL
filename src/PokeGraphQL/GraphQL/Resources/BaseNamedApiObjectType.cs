@@ -5,13 +5,13 @@
 // See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace PokeGraphQL.GraphQL
+namespace PokeGraphQL.GraphQL.Resources
 {
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
 
     internal abstract class BaseNamedApiObjectType<TType> : BaseApiObjectType<TType>
-        where TType : NamedApiObject
+        where TType : NamedApiResource
     {
         /// <inheritdoc/>
         protected override void Configure(IObjectTypeDescriptor<TType> descriptor)
@@ -19,7 +19,13 @@ namespace PokeGraphQL.GraphQL
             descriptor.Field(x => x.Name)
                 .Description($"The name for this {this.ResourceName} resource.")
                 .Type<NonNullType<StringType>>();
-            descriptor.Ignore(x => x.Names);
+
+            // TODO rework into something less sensitive; renaming of the `Names` prop or API changes will break this
+            if (typeof(TType).GetProperty("Names") != null)
+            {
+                descriptor.Field("Names").Ignore();
+            }
+
             base.Configure(descriptor);
         }
     }

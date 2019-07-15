@@ -11,7 +11,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
     using System.Linq;
     using System.Threading.Tasks;
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources.Moves;
 
     internal sealed class StatType : BaseNamedApiObjectType<Stat>
@@ -27,10 +27,10 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
                 .Description("Whether this stat only exists within a battle.");
             descriptor.Field(x => x.AffectingMoves)
                 .Description("A detail of moves which affect this stat positively or negatively.")
-                .Type<MoveStatAffectSetType>();
+                .Type<MoveStatAffectSetsType>();
             descriptor.Field(x => x.AffectingNatures)
                 .Description("A detail of natures which affect this stat positively or negatively.")
-                .Type<NatureStatAffectType>();
+                .Type<NatureStatAffectSetsType>();
             descriptor.Field(x => x.Characteristics)
                 .Description("A list of characteristics that are set on a pokemon when its highest base stat is this stat.")
                 .Type<ListType<CharacteristicType>>()
@@ -48,18 +48,17 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
                 .Resolver((ctx, token) => ctx.Service<MoveResolver>().GetMoveDamageClassAsync(ctx.Parent<Stat>().MoveDamageClass.Name, token));
         }
 
-        private sealed class NatureStatAffectType : ObjectType<StatAffectNature>
+        private sealed class NatureStatAffectSetsType : ObjectType<NatureStatAffectSets>
         {
-            protected override void Configure(IObjectTypeDescriptor<StatAffectNature> descriptor)
+            protected override void Configure(IObjectTypeDescriptor<NatureStatAffectSets> descriptor)
             {
-                descriptor.FixStructType();
                 descriptor.Field(x => x.Increase)
                     .Description("A list of natures and how they change the referenced stat.")
                     .Type<ListType<NatureType>>()
                     .Resolver((ctx, token) =>
                     {
                         var resolver = ctx.Service<PokemonResolver>();
-                        var resourceTasks = ctx.Parent<StatAffectNature>()
+                        var resourceTasks = ctx.Parent<NatureStatAffectSets>()
                             .Increase
                             .Select(nature => resolver.GetNatureAsync(nature.Name, token));
                         return Task.WhenAll(resourceTasks);
@@ -70,7 +69,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
                     .Resolver((ctx, token) =>
                     {
                         var resolver = ctx.Service<PokemonResolver>();
-                        var resourceTasks = ctx.Parent<StatAffectNature>()
+                        var resourceTasks = ctx.Parent<NatureStatAffectSets>()
                             .Decrease
                             .Select(nature => resolver.GetNatureAsync(nature.Name, token));
                         return Task.WhenAll(resourceTasks);
@@ -78,26 +77,23 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
             }
         }
 
-        private sealed class MoveStatAffectType : ObjectType<StatAffect<Move>>
+        private sealed class MoveStatAffectType : ObjectType<MoveStatAffect>
         {
-            protected override void Configure(IObjectTypeDescriptor<StatAffect<Move>> descriptor)
+            protected override void Configure(IObjectTypeDescriptor<MoveStatAffect> descriptor)
             {
-                descriptor.FixStructType();
                 descriptor.Field(x => x.Change)
                     .Description("The maximum amount of change to the referenced stat.");
-                descriptor.Field(x => x.Resource)
-                    .Name("move")
+                descriptor.Field(x => x.Move)
                     .Description("The move causing the change.")
                     .Type<MoveType>()
-                    .Resolver((ctx, token) => ctx.Service<MoveResolver>().GetMoveDamageClassAsync(ctx.Parent<StatAffect<Move>>().Resource.Name, token));
+                    .Resolver((ctx, token) => ctx.Service<MoveResolver>().GetMoveDamageClassAsync(ctx.Parent<MoveStatAffect>().Move.Name, token));
             }
         }
 
-        private sealed class MoveStatAffectSetType : ObjectType<StatAffectSets<Move>>
+        private sealed class MoveStatAffectSetsType : ObjectType<MoveStatAffectSets>
         {
-            protected override void Configure(IObjectTypeDescriptor<StatAffectSets<Move>> descriptor)
+            protected override void Configure(IObjectTypeDescriptor<MoveStatAffectSets> descriptor)
             {
-                descriptor.FixStructType();
                 descriptor.Field(x => x.Increase)
                     .Description("A list of moves and how they change the referenced stat.")
                     .Type<ListType<MoveStatAffectType>>();

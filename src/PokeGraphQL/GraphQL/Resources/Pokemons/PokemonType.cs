@@ -11,7 +11,8 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
     using System.Linq;
     using System.Threading.Tasks;
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
+    using PokeGraphQL.GraphQL.Resources.Common;
     using PokeGraphQL.GraphQL.Resources.Games;
     using PokeGraphQL.GraphQL.Resources.Items;
     using PokeGraphQL.GraphQL.Resources.Locations;
@@ -33,8 +34,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
                 .Description("Set for exactly one pokémon used as the default for each species.");
             descriptor.Field(x => x.Order)
                 .Description("Order for sorting. Almost national order, except families are grouped together.");
-            descriptor.Field(x => x.Mass)
-                .Name("weight")
+            descriptor.Field(x => x.Weight)
                 .Description("The mass of this pokémon.");
             descriptor.Field(x => x.Abilities)
                 .Description("A list of abilities this pokémon could potentially have.")
@@ -66,56 +66,50 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
             descriptor.Field(x => x.Stats)
                 .Description("A list of base stat values for this pokémon.")
                 .Type<ListType<PokemonStatType>>();
-            descriptor.Field(x => x.GameIndices)
+            descriptor.Field(x => x.GameIndicies)
                 .Description("A list of game indices relevent to pokémon item by generation.")
                 .Type<ListType<VersionGameIndexType>>();
-
-            // TODO unignore once a new version of PokeAPI is released
             descriptor.Field(x => x.LocationAreaEncounters)
                 .Description("A list of location areas as well as encounter details pertaining to specific versions.")
                 .Type<ListType<LocationAreaEncounterType>>()
-                .Resolver((ctx, token) => ctx.Service<UrlResolver>().GetAsync<LocationAreaEncounter[]>(ctx.Parent<Pokemon>().LocationAreaEncounters.Path))
-                .Ignore();
+                .Resolver((ctx, token) => ctx.Service<UrlResolver>().GetAsync<LocationAreaEncounter[]>(ctx.Parent<Pokemon>().LocationAreaEncounters));
         }
 
         private sealed class LocationAreaEncounterType : ObjectType<LocationAreaEncounter>
         {
             protected override void Configure(IObjectTypeDescriptor<LocationAreaEncounter> descriptor)
             {
-                descriptor.FixStructType();
                 descriptor.Field(x => x.LocationArea)
                     .Type<LocationAreaType>()
-                    .Resolver((ctx, token) => ctx.Service<LocationResolver>().GetLocationAreaAsync(Convert.ToInt32(ctx.Parent<LocationAreaEncounter>().LocationArea.Url.LastSegment()), token));
+                    .Resolver((ctx, token) => ctx.Service<LocationResolver>().GetLocationAreaAsync(ctx.Parent<LocationAreaEncounter>().LocationArea.Name, token));
                 descriptor.Field(x => x.VersionDetails)
                     .Type<ListType<VersionEncounterDetailType>>();
             }
         }
 
-        private sealed class PokemonStatType : ObjectType<PokemonStats>
+        private sealed class PokemonStatType : ObjectType<PokemonStat>
         {
-            protected override void Configure(IObjectTypeDescriptor<PokemonStats> descriptor)
+            protected override void Configure(IObjectTypeDescriptor<PokemonStat> descriptor)
             {
-                descriptor.FixStructType();
-                descriptor.Field(x => x.BaseValue);
+                descriptor.Field(x => x.BaseStat);
                 descriptor.Field(x => x.Effort);
                 descriptor.Field(x => x.Stat)
                     .Type<StatType>()
-                    .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetStatAsync(ctx.Parent<PokemonStats>().Stat.Name, token));
+                    .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetStatAsync(ctx.Parent<PokemonStat>().Stat.Name, token));
             }
         }
 
-        private sealed class MoveVersionGroupDetailType : ObjectType<MoveVersionGroupDetails>
+        private sealed class PokemonMoveVersionType : ObjectType<PokemonMoveVersion>
         {
-            protected override void Configure(IObjectTypeDescriptor<MoveVersionGroupDetails> descriptor)
+            protected override void Configure(IObjectTypeDescriptor<PokemonMoveVersion> descriptor)
             {
-                descriptor.FixStructType();
-                descriptor.Field(x => x.LearnedAt);
+                descriptor.Field(x => x.LevelLearnedAt);
                 descriptor.Field(x => x.VersionGroup)
                     .Type<VersionGroupType>()
-                    .Resolver((ctx, token) => ctx.Service<GameResolver>().GetVersionGroupAsync(ctx.Parent<MoveVersionGroupDetails>().VersionGroup.Name, token));
-                descriptor.Field(x => x.LearnMethod)
+                    .Resolver((ctx, token) => ctx.Service<GameResolver>().GetVersionGroupAsync(ctx.Parent<PokemonMoveVersion>().VersionGroup.Name, token));
+                descriptor.Field(x => x.MoveLearnMethod)
                     .Type<MoveLearnMethodType>()
-                    .Resolver((ctx, token) => ctx.Service<MoveResolver>().GetMoveLearnMethodAsync(ctx.Parent<MoveVersionGroupDetails>().LearnMethod.Name, token));
+                    .Resolver((ctx, token) => ctx.Service<MoveResolver>().GetMoveLearnMethodAsync(ctx.Parent<PokemonMoveVersion>().MoveLearnMethod.Name, token));
             }
         }
 
@@ -123,12 +117,11 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
         {
             protected override void Configure(IObjectTypeDescriptor<PokemonMove> descriptor)
             {
-                descriptor.FixStructType();
                 descriptor.Field(x => x.Move)
                     .Type<MoveType>()
                     .Resolver((ctx, token) => ctx.Service<MoveResolver>().GetMoveAsync(ctx.Parent<PokemonMove>().Move.Name, token));
                 descriptor.Field(x => x.VersionGroupDetails)
-                    .Type<ListType<MoveVersionGroupDetailType>>();
+                    .Type<ListType<PokemonMoveVersionType>>();
             }
         }
 
@@ -136,7 +129,6 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
         {
             protected override void Configure(IObjectTypeDescriptor<PokemonHeldItem> descriptor)
             {
-                descriptor.FixStructType();
                 descriptor.Field(x => x.Item)
                     .Description("The item that may be holded.")
                     .Type<ItemType>()
@@ -144,7 +136,6 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
                 descriptor.Field(x => x.VersionDetails)
                     .Description("Details on chance of the pokemon having the item based on version.")
                     .Type<ListType<HeldItemVersionDetailsType>>();
-
             }
         }
 
@@ -152,7 +143,6 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
         {
             protected override void Configure(IObjectTypeDescriptor<PokemonAbility> descriptor)
             {
-                descriptor.FixStructType();
                 descriptor.Field(x => x.IsHidden)
                     .Description("Whether or not this is a hidden ability.");
                 descriptor.Field(x => x.Slot)
@@ -164,17 +154,16 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
             }
         }
 
-        private sealed class PokemonTypeMapType : ObjectType<PokemonTypeMap>
+        private sealed class PokemonTypeMapType : ObjectType<PokeApiNet.Models.PokemonType>
         {
-            protected override void Configure(IObjectTypeDescriptor<PokemonTypeMap> descriptor)
+            protected override void Configure(IObjectTypeDescriptor<PokeApiNet.Models.PokemonType> descriptor)
             {
-                descriptor.FixStructType();
                 descriptor.Field(x => x.Slot)
                     .Description("The order the pokémon types are listed in.");
                 descriptor.Field(x => x.Type)
                     .Description("The type the referenced pokémon has.")
                     .Type<TypePropertyType>()
-                    .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetTypeAsync(ctx.Parent<PokemonTypeMap>().Type.Name, token));
+                    .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetTypeAsync(ctx.Parent<PokeApiNet.Models.PokemonType>().Type.Name, token));
             }
         }
     }

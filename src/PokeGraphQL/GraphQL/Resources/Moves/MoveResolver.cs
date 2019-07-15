@@ -9,22 +9,30 @@ namespace PokeGraphQL.GraphQL.Resources.Moves
 {
     using System.Threading;
     using System.Threading.Tasks;
-    using PokeAPI;
+    using PokeApiNet.Data;
+    using PokeApiNet.Models;
 
     public class MoveResolver
     {
-        public virtual async Task<Move> GetMoveAsync(string nameOrId, CancellationToken cancellationToken = default) => await DataFetcher.GetNamedApiObject<Move>(nameOrId).ConfigureAwait(false);
+        private readonly PokeApiClient pokeApiClient;
 
-        public virtual async Task<MoveAilment> GetMoveAilmentAsync(string nameOrId, CancellationToken cancellationToken = default) => await DataFetcher.GetNamedApiObject<MoveAilment>(nameOrId).ConfigureAwait(false);
+        public MoveResolver(PokeApiClient pokeApiClient)
+        {
+            this.pokeApiClient = pokeApiClient;
+        }
 
-        public virtual async Task<MoveDamageClass> GetMoveDamageClassAsync(string nameOrId, CancellationToken cancellationToken = default) => await DataFetcher.GetNamedApiObject<MoveDamageClass>(nameOrId).ConfigureAwait(false);
+        public virtual async Task<Move> GetMoveAsync(string nameOrId, CancellationToken cancellationToken = default) => await this.pokeApiClient.GetResourceFromParamAsync<Move>(nameOrId).ConfigureAwait(false);
 
-        public virtual async Task<MoveLearnMethod> GetMoveLearnMethodAsync(string nameOrId, CancellationToken cancellationToken = default) => await DataFetcher.GetNamedApiObject<MoveLearnMethod>(nameOrId).ConfigureAwait(false);
+        public virtual async Task<MoveAilment> GetMoveAilmentAsync(string nameOrId, CancellationToken cancellationToken = default) => await this.pokeApiClient.GetResourceFromParamAsync<MoveAilment>(nameOrId).ConfigureAwait(false);
 
-        public virtual async Task<MoveTarget> GetMoveTargetAsync(string nameOrId, CancellationToken cancellationToken = default) => await DataFetcher.GetNamedApiObject<MoveTarget>(nameOrId).ConfigureAwait(false);
+        public virtual async Task<MoveDamageClass> GetMoveDamageClassAsync(string nameOrId, CancellationToken cancellationToken = default) => await this.pokeApiClient.GetResourceFromParamAsync<MoveDamageClass>(nameOrId).ConfigureAwait(false);
 
-        public virtual async Task<MoveCategory> GetMoveCategoryAsync(string nameOrId, CancellationToken cancellationToken = default) => await DataFetcher.GetNamedApiObject<MoveCategory>(nameOrId).ConfigureAwait(false);
+        public virtual async Task<MoveLearnMethod> GetMoveLearnMethodAsync(string nameOrId, CancellationToken cancellationToken = default) => await this.pokeApiClient.GetResourceFromParamAsync<MoveLearnMethod>(nameOrId).ConfigureAwait(false);
 
-        public virtual async Task<MoveBattleStyle> GetMoveBattleStyleAsync(string nameOrId, CancellationToken cancellationToken = default) => await DataFetcher.GetNamedApiObject<MoveBattleStyle>(nameOrId).ConfigureAwait(false);
+        public virtual async Task<MoveTarget> GetMoveTargetAsync(string nameOrId, CancellationToken cancellationToken = default) => await this.pokeApiClient.GetResourceFromParamAsync<MoveTarget>(nameOrId).ConfigureAwait(false);
+
+        public virtual async Task<MoveCategory> GetMoveCategoryAsync(string nameOrId, CancellationToken cancellationToken = default) => await this.pokeApiClient.GetResourceFromParamAsync<MoveCategory>(nameOrId).ConfigureAwait(false);
+
+        public virtual async Task<MoveBattleStyle> GetMoveBattleStyleAsync(string nameOrId, CancellationToken cancellationToken = default) => await this.pokeApiClient.GetResourceFromParamAsync<MoveBattleStyle>(nameOrId).ConfigureAwait(false);
     }
 }

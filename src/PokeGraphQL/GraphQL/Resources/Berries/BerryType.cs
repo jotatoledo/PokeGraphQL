@@ -8,7 +8,7 @@
 namespace PokeGraphQL.GraphQL.Resources.Berries
 {
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources.Items;
     using PokeGraphQL.GraphQL.Resources.Pokemons;
 
@@ -39,7 +39,6 @@ namespace PokeGraphQL.GraphQL.Resources.Berries
             /// <inheritdoc/>
             protected override void Configure(IObjectTypeDescriptor<BerryFlavorMap> descriptor)
             {
-                descriptor.FixStructType();
                 descriptor.Field(x => x.Potency)
                     .Description("How powerful the referenced flavor is for this berry.");
                 descriptor.Field(x => x.Flavor)

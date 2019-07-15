@@ -9,14 +9,22 @@ namespace PokeGraphQL.GraphQL.Resources.Berries
 {
     using System.Threading;
     using System.Threading.Tasks;
-    using PokeAPI;
+    using PokeApiNet.Data;
+    using PokeApiNet.Models;
 
     internal class BerryResolver
     {
-        public virtual async Task<Berry> GetBerryAsync(string nameOrId, CancellationToken cancellationToken = default) => await DataFetcher.GetNamedApiObject<Berry>(nameOrId).ConfigureAwait(false);
+        private readonly PokeApiClient pokeApiClient;
 
-        public virtual async Task<BerryFirmness> GetBerryFirmnessAsync(string nameOrId, CancellationToken cancellationToken = default) => await DataFetcher.GetNamedApiObject<BerryFirmness>(nameOrId).ConfigureAwait(false);
+        public BerryResolver(PokeApiClient pokeApiClient)
+        {
+            this.pokeApiClient = pokeApiClient;
+        }
 
-        public virtual async Task<BerryFlavor> GetBerryFlavorAsync(string nameOrId, CancellationToken cancellationToken = default) => await DataFetcher.GetNamedApiObject<BerryFlavor>(nameOrId).ConfigureAwait(false);
+        public virtual async Task<Berry> GetBerryAsync(string nameOrId, CancellationToken cancellationToken = default) => await this.pokeApiClient.GetResourceFromParamAsync<Berry>(nameOrId).ConfigureAwait(false);
+
+        public virtual async Task<BerryFirmness> GetBerryFirmnessAsync(string nameOrId, CancellationToken cancellationToken = default) => await this.pokeApiClient.GetResourceFromParamAsync<BerryFirmness>(nameOrId).ConfigureAwait(false);
+
+        public virtual async Task<BerryFlavor> GetBerryFlavorAsync(string nameOrId, CancellationToken cancellationToken = default) => await this.pokeApiClient.GetResourceFromParamAsync<BerryFlavor>(nameOrId).ConfigureAwait(false);
     }
 }

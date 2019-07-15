@@ -39,8 +39,9 @@ namespace PokeGraphQL.GraphQL
             services.AddScoped<MoveResolver>();
             services.AddScoped<EvolutionResolver>();
             services.AddScoped<LanguageResolver>();
-            services.AddScoped<UrlResolver>();
             services.AddScoped<MachineResolver>();
+            services.AddScoped<UrlResolver>();
+            services.AddScoped<ListResolver>();
 
             services.AddGraphQL(
                 sp => SchemaBuilder.New()

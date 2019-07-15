@@ -10,7 +10,7 @@ namespace PokeGraphQL.GraphQL.Resources.Evolutions
     using System.Threading.Tasks;
     using DotNetFunctional.Maybe;
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources.Items;
     using PokeGraphQL.GraphQL.Resources.Locations;
     using PokeGraphQL.GraphQL.Resources.Moves;
@@ -44,7 +44,6 @@ namespace PokeGraphQL.GraphQL.Resources.Evolutions
         {
             protected override void Configure(IObjectTypeDescriptor<EvolutionDetail> descriptor)
             {
-                descriptor.FixStructType();
                 descriptor.Field(x => x.Item)
                     .Description("The item required to cause evolution this into pokémon species.")
                     .Type<ItemType>()
@@ -74,7 +73,7 @@ namespace PokeGraphQL.GraphQL.Resources.Evolutions
                     .Type<TypePropertyType>()
                     .Resolver((ctx, token) => MonadMaybe.Lift(ctx.Parent<EvolutionDetail>().KnownMoveType)
                         .Select(x => x.Name)
-                        .Match(name => ctx.Service<PokemonResolver>().GetTypeAsync(name, token), Task.FromResult<PokeAPI.PokemonType>(default)));
+                        .Match(name => ctx.Service<PokemonResolver>().GetTypeAsync(name, token), Task.FromResult<Type>(default)));
                 descriptor.Field(x => x.Location)
                     .Description("The location the evolution must be triggered at.")
                     .Type<LocationType>()
@@ -102,7 +101,7 @@ namespace PokeGraphQL.GraphQL.Resources.Evolutions
                     .Type<TypePropertyType>()
                     .Resolver((ctx, token) => MonadMaybe.Lift(ctx.Parent<EvolutionDetail>().PartyType)
                         .Select(x => x.Name)
-                        .Match(name => ctx.Service<PokemonResolver>().GetTypeAsync(name, token), Task.FromResult<PokeAPI.PokemonType>(default)));
+                        .Match(name => ctx.Service<PokemonResolver>().GetTypeAsync(name, token), Task.FromResult<Type>(default)));
                 descriptor.Field(x => x.RelativePhysicalStats)
                     .Description("The required relation between the Pokémon's Attack and Defense stats. 1 means Attack > Defense. 0 means Attack = Defense. -1 means Attack < Defense.");
                 descriptor.Field(x => x.TimeOfDay)
@@ -122,7 +121,6 @@ namespace PokeGraphQL.GraphQL.Resources.Evolutions
         {
             protected override void Configure(IObjectTypeDescriptor<ChainLink> descriptor)
             {
-                descriptor.FixStructType();
                 descriptor.Field(x => x.IsBaby)
                     .Description(@"Whether or not this link is for a baby pokémon. 
                         This would only ever be true on the base link.");
@@ -130,7 +128,7 @@ namespace PokeGraphQL.GraphQL.Resources.Evolutions
                     .Description("The pokemon species at this point in the evolution chain.")
                     .Type<PokemonSpeciesType>()
                     .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetPokemonSpeciesAsync(ctx.Parent<ChainLink>().Species.Name, token));
-                descriptor.Field(x => x.Details)
+                descriptor.Field(x => x.EvolutionDetails)
                     .Description("All details regarding the specific details of the referenced pokémon species evolution.")
                     .Type<ListType<EvolutionDetailType>>();
                 descriptor.Field(x => x.EvolvesTo)

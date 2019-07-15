@@ -8,7 +8,7 @@
 namespace PokeGraphQL.GraphQL.Resources.Pokemons
 {
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
 
     internal sealed class PokeathlonStatType : BaseNamedApiObjectType<PokeathlonStat>
     {
@@ -26,7 +26,6 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
         {
             protected override void Configure(IObjectTypeDescriptor<NaturePokeathlonStatAffect> descriptor)
             {
-                descriptor.FixStructType();
                 descriptor.Field(x => x.MaxChange)
                     .Description("The maximum amount of change to the referenced pokéathlon stat.");
                 descriptor.Field(x => x.Nature)
@@ -40,7 +39,6 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
         {
             protected override void Configure(IObjectTypeDescriptor<NaturePokeathlonStatAffectSets> descriptor)
             {
-                descriptor.FixStructType();
                 descriptor.Field(x => x.Increase)
                     .Description("A list of natures and how they change the referenced pokéathlon stat.")
                     .Type<ListType<NaturePokeathlonStatAffectType>>();

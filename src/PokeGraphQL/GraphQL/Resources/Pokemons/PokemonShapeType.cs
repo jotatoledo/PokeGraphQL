@@ -10,7 +10,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
     using System.Linq;
     using System.Threading.Tasks;
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources.Languages;
 
     internal sealed class PokemonShapeType : BaseNamedApiObjectType<PokemonShape>
@@ -22,30 +22,29 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
             descriptor.Field(x => x.AwesomeNames)
                 .Description("The \"scientific\" name of this pokémon shape listed in different languages.")
                 .Type<ListType<AwesomeNameType>>();
-            descriptor.Field(x => x.Species)
+            descriptor.Field(x => x.PokemonSpecies)
                 .Description("A list of the pokémon species that have this shape.")
                 .Type<ListType<PokemonSpeciesType>>()
                 .Resolver((ctx, token) =>
                 {
                     var resolver = ctx.Service<PokemonResolver>();
                     var resourceTasks = ctx.Parent<PokemonShape>()
-                        .Species
+                        .PokemonSpecies
                         .Select(species => resolver.GetPokemonSpeciesAsync(species.Name, token));
                     return Task.WhenAll(resourceTasks);
                 });
         }
 
-        private sealed class AwesomeNameType : ObjectType<AwesomeName>
+        private sealed class AwesomeNameType : ObjectType<AwesomeNames>
         {
-            protected override void Configure(IObjectTypeDescriptor<AwesomeName> descriptor)
+            protected override void Configure(IObjectTypeDescriptor<AwesomeNames> descriptor)
             {
-                descriptor.FixStructType();
-                descriptor.Field(x => x.Name)
+                descriptor.Field(x => x.AwesomeName)
                     .Description("The localized \"scientific\" name for an API resource in a specific language.");
                 descriptor.Field(x => x.Language)
                     .Description("The language this \"scientific\" name is in.")
                     .Type<LanguageType>()
-                    .Resolver((ctx, token) => ctx.Service<LanguageResolver>().GetLanguageAsync(ctx.Parent<AwesomeName>().Language.Name, token));
+                    .Resolver((ctx, token) => ctx.Service<LanguageResolver>().GetLanguageAsync(ctx.Parent<AwesomeNames>().Language.Name, token));
             }
         }
     }

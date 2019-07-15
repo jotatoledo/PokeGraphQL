@@ -9,10 +9,18 @@ namespace PokeGraphQL.GraphQL.Resources.Languages
 {
     using System.Threading;
     using System.Threading.Tasks;
-    using PokeAPI;
+    using PokeApiNet.Data;
+    using PokeApiNet.Models;
 
     public class LanguageResolver
     {
-        public virtual async Task<Language> GetLanguageAsync(string nameOrId, CancellationToken cancellationToken = default) => await DataFetcher.GetNamedApiObject<Language>(nameOrId).ConfigureAwait(false);
+        private readonly PokeApiClient pokeApiClient;
+
+        public LanguageResolver(PokeApiClient pokeApiClient)
+        {
+            this.pokeApiClient = pokeApiClient;
+        }
+
+        public virtual async Task<Language> GetLanguageAsync(string nameOrId, CancellationToken cancellationToken = default) => await this.pokeApiClient.GetResourceFromParamAsync<Language>(nameOrId).ConfigureAwait(false);
     }
 }

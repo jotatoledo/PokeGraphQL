@@ -8,7 +8,7 @@
 namespace PokeGraphQL.GraphQL.Resources.Locations
 {
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources.Pokemons;
 
     internal sealed class PalParkAreaType : BaseNamedApiObjectType<PalParkArea>
@@ -17,7 +17,7 @@ namespace PokeGraphQL.GraphQL.Resources.Locations
         protected override void ConcreteConfigure(IObjectTypeDescriptor<PalParkArea> descriptor)
         {
             descriptor.Description("Areas used for grouping pokémon encounters in Pal Park. They're like habitats that are specific to Pal Park.");
-            descriptor.Field(x => x.Encounters)
+            descriptor.Field(x => x.PokemonEncounters)
                 .Description("A list of pokémon encountered in thi pal park area along with details")
                 .Type<ListType<PalParkEncounterSpeciesType>>();
         }
@@ -26,15 +26,14 @@ namespace PokeGraphQL.GraphQL.Resources.Locations
         {
             protected override void Configure(IObjectTypeDescriptor<PalParkEncounterSpecies> descriptor)
             {
-                descriptor.FixStructType();
                 descriptor.Field(x => x.BaseScore)
                     .Description("The base score given to the player when this pokémon is caught during a pal park run.");
                 descriptor.Field(x => x.Rate)
                     .Description("The base rate for encountering this pokémon in this pal park area.");
-                descriptor.Field(x => x.Species)
+                descriptor.Field(x => x.PokemonSpecies)
                     .Description("The pokémon species being encountered.")
                     .Type<PokemonSpeciesType>()
-                    .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetPokemonSpeciesAsync(ctx.Parent<PalParkEncounterSpecies>().Species.Name, token));
+                    .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetPokemonSpeciesAsync(ctx.Parent<PalParkEncounterSpecies>().PokemonSpecies.Name, token));
             }
         }
     }

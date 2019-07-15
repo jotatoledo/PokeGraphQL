@@ -4,7 +4,7 @@ All the Pokémon data you'll ever need in one place, easily accessible through a 
 
 > The GraphQL API is possible thanks to the awesome [HotChocolate project](https://github.com/ChilliCream/hotchocolate).
 
-> The RESTful API provided by the awesome [PokeAPI project](https://github.com/PokeAPI/pokeapi) is consumed through the [PokeApi.Net project](https://gitlab.com/PoroCYon/PokeApi.NET).
+> The RESTful API provided by the awesome [PokeAPI project](https://github.com/PokeAPI/pokeapi) is consumed through the [PokeApiNet project](https://github.com/mtrdp642/PokeApiNet).
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 

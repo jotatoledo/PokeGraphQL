@@ -10,24 +10,24 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
     using System.Linq;
     using System.Threading.Tasks;
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
 
-    internal sealed class PokemonColorType : BaseNamedApiObjectType<PokemonColour>
+    internal sealed class PokemonColorType : BaseNamedApiObjectType<PokemonColor>
     {
         /// <inheritdoc/>
-        protected override void ConcreteConfigure(IObjectTypeDescriptor<PokemonColour> descriptor)
+        protected override void ConcreteConfigure(IObjectTypeDescriptor<PokemonColor> descriptor)
         {
             descriptor.Description(@"Colors used for sorting pokémon in a pokédex. 
                 The color listed in the Pokédex is usually the color most apparent or covering each Pokémon's body. 
                 No orange category exists; Pokémon that are primarily orange are listed as red or brown.");
-            descriptor.Field(x => x.Species)
+            descriptor.Field(x => x.PokemonSpecies)
                 .Description("A list of the pokémon species that have this color.")
                 .Type<ListType<PokemonSpeciesType>>()
                 .Resolver((ctx, token) =>
                 {
                     var resolver = ctx.Service<PokemonResolver>();
-                    var resourceTasks = ctx.Parent<PokemonColour>()
-                        .Species
+                    var resourceTasks = ctx.Parent<PokemonColor>()
+                        .PokemonSpecies
                         .Select(species => resolver.GetPokemonSpeciesAsync(species.Name, token));
                     return Task.WhenAll(resourceTasks);
                 });

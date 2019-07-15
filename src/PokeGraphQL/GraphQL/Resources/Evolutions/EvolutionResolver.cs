@@ -9,12 +9,20 @@ namespace PokeGraphQL.GraphQL.Resources.Evolutions
 {
     using System.Threading;
     using System.Threading.Tasks;
-    using PokeAPI;
+    using PokeApiNet.Data;
+    using PokeApiNet.Models;
 
     public class EvolutionResolver
     {
-        public virtual async Task<EvolutionChain> GetEvolutionChainAsync(int id, CancellationToken cancellationToken = default) => await DataFetcher.GetApiObject<EvolutionChain>(id).ConfigureAwait(false);
+        private readonly PokeApiClient pokeApiClient;
 
-        public virtual async Task<EvolutionTrigger> GetEvolutionTriggerAsync(string nameOrId, CancellationToken cancellationToken = default) => await DataFetcher.GetNamedApiObject<EvolutionTrigger>(nameOrId).ConfigureAwait(false);
+        public EvolutionResolver(PokeApiClient pokeApiClient)
+        {
+            this.pokeApiClient = pokeApiClient;
+        }
+
+        public virtual async Task<EvolutionChain> GetEvolutionChainAsync(int id, CancellationToken cancellationToken = default) => await this.pokeApiClient.GetResourceAsync<EvolutionChain>(id).ConfigureAwait(false);
+
+        public virtual async Task<EvolutionTrigger> GetEvolutionTriggerAsync(string nameOrId, CancellationToken cancellationToken = default) => await this.pokeApiClient.GetResourceFromParamAsync<EvolutionTrigger>(nameOrId).ConfigureAwait(false);
     }
 }

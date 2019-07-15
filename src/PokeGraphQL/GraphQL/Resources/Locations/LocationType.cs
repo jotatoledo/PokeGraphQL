@@ -11,7 +11,8 @@ namespace PokeGraphQL.GraphQL.Resources.Locations
     using System.Linq;
     using System.Threading.Tasks;
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
+    using PokeGraphQL.GraphQL.Resources.Common;
 
     internal sealed class LocationType : BaseNamedApiObjectType<Location>
     {
@@ -34,7 +35,7 @@ namespace PokeGraphQL.GraphQL.Resources.Locations
                     var resolver = ctx.Service<LocationResolver>();
                     var resourceTasks = ctx.Parent<Location>()
                         .Areas
-                        .Select(area => resolver.GetLocationAreaAsync(Convert.ToInt32(area.Url.LastSegment()), token));
+                        .Select(area => resolver.GetLocationAreaAsync(area.Name, token));
                     return Task.WhenAll(resourceTasks);
                 });
         }

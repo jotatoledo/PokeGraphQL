@@ -8,7 +8,7 @@
 namespace PokeGraphQL.GraphQL.Resources.Pokemons
 {
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources.Games;
 
     internal sealed class PokemonFormType : BaseNamedApiObjectType<PokemonForm>
@@ -30,7 +30,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
                 .Description("True for exactly one form used as the default for each pokémon.");
             descriptor.Field(x => x.IsBattleOnly)
                 .Description("Whether or not this form can only happen during battle.");
-            descriptor.Field(x => x.IsMegaEvolution)
+            descriptor.Field(x => x.IsMega)
                 .Description("Whether or not this form requires mega evolution.");
             descriptor.Field(x => x.FormName)
                 .Description("The name of this form.");

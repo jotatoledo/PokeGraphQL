@@ -5,10 +5,10 @@
 // See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace PokeGraphQL.GraphQL.Resources
+namespace PokeGraphQL.GraphQL.Resources.Common
 {
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources.Games;
 
     internal sealed class AbilityEffectChangeType : ObjectType<AbilityEffectChange>
@@ -16,13 +16,11 @@ namespace PokeGraphQL.GraphQL.Resources
         /// <inheritdoc/>
         protected override void Configure(IObjectTypeDescriptor<AbilityEffectChange> descriptor)
         {
-            descriptor.FixStructType();
-
-            // TODO type should be changed upstream to `Effect[]`.
+            // TODO type should be changed upstream to `List<Effects>`
             // See 'effect_changes' structure in https://pokeapi.co/api/v2/ability/1
-            descriptor.Field(x => x.Effects)
+            descriptor.Field(x => x.EffectEntries)
                 .Description("The previous effect of this ability listed in different languages.")
-                .Type<ListType<EffectType>>();
+                .Type<ListType<EffectsType>>();
             descriptor.Field(x => x.VersionGroup)
                 .Description("The version group in which the previous effect of this ability originated.")
                 .Type<VersionGroupType>()

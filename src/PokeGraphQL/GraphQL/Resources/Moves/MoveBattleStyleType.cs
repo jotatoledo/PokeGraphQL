@@ -8,7 +8,7 @@
 namespace PokeGraphQL.GraphQL.Resources.Moves
 {
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
 
     internal sealed class MoveBattleStyleType : BaseNamedApiObjectType<MoveBattleStyle>
     {

@@ -8,6 +8,7 @@
 namespace PokeGraphQL
 {
     using System;
+    using System.Net.Http;
     using HotChocolate.AspNetCore;
     using HotChocolate.AspNetCore.GraphiQL;
     using HotChocolate.AspNetCore.Voyager;
@@ -17,6 +18,7 @@ namespace PokeGraphQL
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
+    using PokeApiNet.Data;
     using PokeGraphQL.GraphQL;
 
     public class Startup
@@ -36,6 +38,14 @@ namespace PokeGraphQL
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddHotChocolate();
+            services.AddSingleton<PokeApiClient>();
+            services.AddSingleton(s =>
+            {
+                // TODO clean up, add app version
+                var client = new HttpClient();
+                client.DefaultRequestHeaders.UserAgent.ParseAdd("PokegraphQL (https://github.com/jotatoledo/PokeGraphQL)");
+                return client;
+            });
 
             if (string.Equals(this.Configuration.GetValue<string>("ASPNETCORE_HSTS_ENABLED"), "true", StringComparison.OrdinalIgnoreCase))
             {
@@ -74,7 +84,7 @@ namespace PokeGraphQL
                 .UseXContentTypeOptions()
                 .UseReferrerPolicy(options => options.StrictOriginWhenCrossOrigin())
                 .UseCsp(options => options
-                    .DefaultSources(s => s.Self())
+                    .DefaultSources(s => s.None())
                     .ScriptSources(s => s.Self().UnsafeInline())
                     .StyleSources(s => s.Self().UnsafeInline())
                     .ObjectSources(s => s.None())
@@ -83,7 +93,11 @@ namespace PokeGraphQL
                     .FrameSources(s => s.None())
                     .FontSources(s => s.None())
                     .ConnectSources(s => s.Self())
-                    .WorkerSources(s => s.Self().CustomSources("blob:")));
+                    .BaseUris(s => s.None())
+                    .FrameAncestors(s => s.None())
+                    .FormActions(s => s.None())
+                    .WorkerSources(s => s.Self().CustomSources("blob:"))
+                    .ManifestSources(s => s.None()));
 
             app.UseGraphQL("/graphql")
                 .UseGraphiQL(new GraphiQLOptions

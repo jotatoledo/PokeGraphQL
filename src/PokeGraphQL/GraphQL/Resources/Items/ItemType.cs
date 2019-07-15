@@ -11,7 +11,8 @@ namespace PokeGraphQL.GraphQL.Resources.Items
     using System.Linq;
     using System.Threading.Tasks;
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
+    using PokeGraphQL.GraphQL.Resources.Common;
     using PokeGraphQL.GraphQL.Resources.Evolutions;
     using PokeGraphQL.GraphQL.Resources.Pokemons;
     using PokemonType = PokeGraphQL.GraphQL.Resources.Pokemons.PokemonType;
@@ -46,9 +47,9 @@ namespace PokeGraphQL.GraphQL.Resources.Items
                 .Description("The category of items this item falls into.")
                 .Type<ItemCategoryType>()
                 .Resolver((ctx, token) => ctx.Service<ItemResolver>().GetCategoryAsync(ctx.Parent<Item>().Category.Name, token));
-            descriptor.Field(x => x.HeldBy)
+            descriptor.Field(x => x.HeldByPokemon)
                 .Description("A list of pokémon that might be found in the wild holding this item.")
-                .Type<ListType<HeldByPokemonType>>();
+                .Type<ListType<ItemHolderPokemonType>>();
             descriptor.Field(x => x.GameIndices)
                 .Description("A list of game indices relevent to this item by generation.")
                 .Type<ListType<GenerationGameIndexType>>();
@@ -56,23 +57,23 @@ namespace PokeGraphQL.GraphQL.Resources.Items
                 .Description("An evolution chain this item requires to produce a bay during mating.")
                 .Type<EvolutionChainType>()
                 .Resolver((ctx, token) => ctx.Service<EvolutionResolver>().GetEvolutionChainAsync(Convert.ToInt32(ctx.Parent<Item>().BabyTriggerFor.Url), token));
-            descriptor.Field(x => x.Effects)
+            descriptor.Field(x => x.EffectEntries)
                 .Description("The effect of this ability listed in different languages.")
                 .Type<ListType<VerboseEffectType>>();
-            descriptor.Field(x => x.FlavorTexts)
-                .Description("	The flavor text of this ability listed in different languages.")
+            descriptor.Field(x => x.FlavorGroupTextEntries)
+                .Description("The flavor text of this ability listed in different languages.")
                 .Type<ListType<VersionGroupFlavorTextType>>();
         }
 
-        private sealed class HeldByPokemonType : ObjectType<ItemHeldBy>
+        private sealed class ItemHolderPokemonType : ObjectType<ItemHolderPokemon>
         {
             /// <inheritdoc/>
-            protected override void Configure(IObjectTypeDescriptor<ItemHeldBy> descriptor)
+            protected override void Configure(IObjectTypeDescriptor<ItemHolderPokemon> descriptor)
             {
                 descriptor.Field(x => x.Pokemon)
                     .Description("The pokemon who might be holding the item.")
                     .Type<PokemonType>()
-                    .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetPokemonAsync(ctx.Parent<ItemHeldBy>().Pokemon.Name, token));
+                    .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetPokemonAsync(ctx.Parent<ItemHolderPokemon>().Pokemon.Name, token));
                 descriptor.Field(x => x.VersionDetails)
                     .Description("Details on chance of the pokemon having the item based on version.")
                     .Type<ListType<HeldItemVersionDetailsType>>();

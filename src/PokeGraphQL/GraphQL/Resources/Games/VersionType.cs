@@ -8,18 +8,18 @@
 namespace PokeGraphQL.GraphQL.Resources.Games
 {
     using HotChocolate.Types;
-    using PokeAPI;
+    using PokeApiNet.Models;
 
-    internal sealed class VersionType : BaseNamedApiObjectType<GameVersion>
+    internal sealed class VersionType : BaseNamedApiObjectType<Version>
     {
         /// <inheritdoc/>
-        protected override void ConcreteConfigure(IObjectTypeDescriptor<GameVersion> descriptor)
+        protected override void ConcreteConfigure(IObjectTypeDescriptor<Version> descriptor)
         {
             descriptor.Description("Versions of the games, e.g., Red, Blue or Yellow.");
             descriptor.Field(x => x.VersionGroup)
                 .Description("The version group this version belongs to.")
                 .Type<VersionGroupType>()
-                .Resolver((ctx, token) => ctx.Service<GameResolver>().GetVersionGroupAsync(ctx.Parent<GameVersion>().VersionGroup.Name, token));
+                .Resolver((ctx, token) => ctx.Service<GameResolver>().GetVersionGroupAsync(ctx.Parent<Version>().VersionGroup.Name, token));
         }
     }
 }
