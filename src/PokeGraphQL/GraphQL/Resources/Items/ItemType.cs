@@ -12,6 +12,7 @@ namespace PokeGraphQL.GraphQL.Resources.Items
     using System.Threading.Tasks;
     using HotChocolate.Types;
     using PokeApiNet.Models;
+    using PokeGraphQL.GraphQL.Resources.Common;
     using PokeGraphQL.GraphQL.Resources.Evolutions;
     using PokeGraphQL.GraphQL.Resources.Pokemons;
     using PokemonType = PokeGraphQL.GraphQL.Resources.Pokemons.PokemonType;

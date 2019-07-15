@@ -9,6 +9,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
 {
     using HotChocolate.Types;
     using PokeApiNet.Models;
+    using PokeGraphQL.GraphQL.Resources.Common;
     using PokeGraphQL.GraphQL.Resources.Games;
 
     internal sealed class AbilityType : BaseNamedApiObjectType<Ability>

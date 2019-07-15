@@ -5,7 +5,7 @@
 // See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace PokeGraphQL.GraphQL.Resources
+namespace PokeGraphQL.GraphQL.Resources.Common
 {
     using HotChocolate.Types;
     using PokeApiNet.Models;

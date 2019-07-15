@@ -15,6 +15,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
     using HotChocolate.Resolvers;
     using HotChocolate.Types;
     using PokeApiNet.Models;
+    using PokeGraphQL.GraphQL.Resources.Common;
     using PokeGraphQL.GraphQL.Resources.Games;
     using PokeGraphQL.GraphQL.Resources.Moves;
     using TypeProperty = PokeApiNet.Models.Type;

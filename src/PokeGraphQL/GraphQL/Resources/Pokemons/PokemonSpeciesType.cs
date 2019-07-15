@@ -12,6 +12,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
     using System.Threading.Tasks;
     using HotChocolate.Types;
     using PokeApiNet.Models;
+    using PokeGraphQL.GraphQL.Resources.Common;
     using PokeGraphQL.GraphQL.Resources.Evolutions;
     using PokeGraphQL.GraphQL.Resources.Games;
     using PokeGraphQL.GraphQL.Resources.Languages;

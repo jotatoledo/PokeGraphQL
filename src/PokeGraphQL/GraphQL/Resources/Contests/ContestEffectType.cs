@@ -9,6 +9,7 @@ namespace PokeGraphQL.GraphQL.Resources.Contests
 {
     using HotChocolate.Types;
     using PokeApiNet.Models;
+    using PokeGraphQL.GraphQL.Resources.Common;
 
     internal sealed class ContestEffectType : BaseApiObjectType<ContestEffect>
     {

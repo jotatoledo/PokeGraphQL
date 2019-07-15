@@ -11,6 +11,7 @@ namespace PokeGraphQL.GraphQL.Resources.Items
     using System.Threading.Tasks;
     using HotChocolate.Types;
     using PokeApiNet.Models;
+    using PokeGraphQL.GraphQL.Resources.Common;
 
     internal sealed class ItemFlingEffectType : BaseNamedApiObjectType<ItemFlingEffect>
     {

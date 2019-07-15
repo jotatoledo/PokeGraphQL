@@ -9,6 +9,7 @@ namespace PokeGraphQL.GraphQL.Resources.Locations
 {
     using HotChocolate.Types;
     using PokeApiNet.Models;
+    using PokeGraphQL.GraphQL.Resources.Common;
     using PokeGraphQL.GraphQL.Resources.Encounters;
     using PokeGraphQL.GraphQL.Resources.Games;
     using PokeGraphQL.GraphQL.Resources.Pokemons;

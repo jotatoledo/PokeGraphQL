@@ -12,6 +12,7 @@ namespace PokeGraphQL.GraphQL.Resources.Locations
     using System.Threading.Tasks;
     using HotChocolate.Types;
     using PokeApiNet.Models;
+    using PokeGraphQL.GraphQL.Resources.Common;
 
     internal sealed class LocationType : BaseNamedApiObjectType<Location>
     {

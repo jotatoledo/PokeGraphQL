@@ -13,6 +13,7 @@ namespace PokeGraphQL.GraphQL.Resources.Moves
     using DotNetFunctional.Maybe;
     using HotChocolate.Types;
     using PokeApiNet.Models;
+    using PokeGraphQL.GraphQL.Resources.Common;
     using PokeGraphQL.GraphQL.Resources.Contests;
     using PokeGraphQL.GraphQL.Resources.Games;
     using PokeGraphQL.GraphQL.Resources.Pokemons;

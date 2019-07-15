@@ -5,7 +5,7 @@
 // See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace PokeGraphQL.GraphQL
+namespace PokeGraphQL.GraphQL.Resources
 {
     using System.Text.RegularExpressions;
     using HotChocolate.Types;

@@ -11,6 +11,7 @@ namespace PokeGraphQL.GraphQL.Resources.Contests
     using System.Threading.Tasks;
     using HotChocolate.Types;
     using PokeApiNet.Models;
+    using PokeGraphQL.GraphQL.Resources.Common;
     using PokeGraphQL.GraphQL.Resources.Moves;
 
     internal sealed class SuperContestEffectType : BaseApiObjectType<SuperContestEffect>

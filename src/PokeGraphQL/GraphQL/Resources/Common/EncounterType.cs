@@ -5,12 +5,13 @@
 // See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace PokeGraphQL.GraphQL.Resources.Encounters
+namespace PokeGraphQL.GraphQL.Resources.Common
 {
     using System.Linq;
     using System.Threading.Tasks;
     using HotChocolate.Types;
     using PokeApiNet.Models;
+    using PokeGraphQL.GraphQL.Resources.Encounters;
 
     internal sealed class EncounterType : ObjectType<Encounter>
     {
