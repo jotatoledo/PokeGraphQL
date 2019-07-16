@@ -18,10 +18,7 @@ namespace PokeGraphQL.GraphQL.Resources.Common
         {
             descriptor.Field(x => x.FlavorText)
                 .Description("The localized name for an api resource in a specific language.");
-            descriptor.Field(x => x.Language)
-                .Description("The language this flavor text is in")
-                .Type<LanguageType>()
-                .Resolver((ctx, token) => ctx.Service<LanguageResolver>().GetLanguageAsync(ctx.Parent<FlavorTexts>().Language.Name, token));
+            descriptor.UseNamedApiResourceField<FlavorTexts, Language, LanguageType>(x => x.Language);
         }
     }
 }

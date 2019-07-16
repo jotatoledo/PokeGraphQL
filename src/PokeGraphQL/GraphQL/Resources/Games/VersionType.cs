@@ -16,10 +16,7 @@ namespace PokeGraphQL.GraphQL.Resources.Games
         protected override void ConcreteConfigure(IObjectTypeDescriptor<Version> descriptor)
         {
             descriptor.Description("Versions of the games, e.g., Red, Blue or Yellow.");
-            descriptor.Field(x => x.VersionGroup)
-                .Description("The version group this version belongs to.")
-                .Type<VersionGroupType>()
-                .Resolver((ctx, token) => ctx.Service<GameResolver>().GetVersionGroupAsync(ctx.Parent<Version>().VersionGroup.Name, token));
+            descriptor.UseNamedApiResourceField<Version, VersionGroup, VersionGroupType>(x => x.VersionGroup);
         }
     }
 }

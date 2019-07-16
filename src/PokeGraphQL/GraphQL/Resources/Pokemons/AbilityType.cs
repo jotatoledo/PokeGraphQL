@@ -21,10 +21,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
                 Pokémon have mutiple possible abilities but can have only one ability at a time.");
             descriptor.Field(x => x.IsMainSeries)
                 .Description("Whether or not this ability originated in the main series of the video games.");
-            descriptor.Field(x => x.Generation)
-                .Description("The generation this ability originated in.")
-                .Type<GenerationType>()
-                .Resolver((ctx, token) => ctx.Service<GameResolver>().GetGenerationAsync(ctx.Parent<Ability>().Generation.Name, token));
+            descriptor.UseNamedApiResourceField<Ability, Generation, GenerationType>(x => x.Generation);
             descriptor.Field(x => x.EffectEntries)
                 .Description("The effect of this ability listed in different languages.")
                 .Type<ListType<VerboseEffectType>>();
@@ -47,10 +44,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
                     .Description("Whether or not this a hidden ability for the referenced pokémon.");
                 descriptor.Field(x => x.Slot)
                     .Description("Pokémon have 3 ability 'slots' which hold references to possible abilities they could have. This is the slot of this ability for the referenced pokémon.");
-                descriptor.Field(x => x.Pokemon)
-                    .Description("The pokémon this ability could belong to.")
-                    .Type<PokemonType>()
-                    .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetPokemonAsync(ctx.Parent<AbilityPokemon>().Pokemon.Name, token));
+                descriptor.UseNamedApiResourceField<AbilityPokemon, Pokemon, PokemonType>(x => x.Pokemon);
             }
         }
     }

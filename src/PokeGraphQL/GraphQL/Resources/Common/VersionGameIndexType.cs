@@ -18,10 +18,7 @@ namespace PokeGraphQL.GraphQL.Resources.Common
         {
             descriptor.Field(x => x.GameIndex)
                 .Description("The internal id of an API resource within game data.");
-            descriptor.Field(x => x.Version)
-                .Description("The version relevent to this game index.")
-                .Type<VersionType>()
-                .Resolver((ctx, token) => ctx.Service<GameResolver>().GetVersionAsync(ctx.Parent<VersionGameIndex>().Version.Name, token));
+            descriptor.UseNamedApiResourceField<VersionGameIndex, Version, VersionType>(x => x.Version);
         }
     }
 }

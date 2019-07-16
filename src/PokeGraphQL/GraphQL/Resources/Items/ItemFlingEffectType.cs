@@ -7,8 +7,6 @@
 
 namespace PokeGraphQL.GraphQL.Resources.Items
 {
-    using System.Linq;
-    using System.Threading.Tasks;
     using HotChocolate.Types;
     using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources.Common;
@@ -22,17 +20,7 @@ namespace PokeGraphQL.GraphQL.Resources.Items
             descriptor.Field(x => x.EffectEntries)
                 .Description("The result of this fling effect listed in different languages.")
                 .Type<ListType<EffectsType>>();
-            descriptor.Field(x => x.Items)
-                .Description("A list of items that have this fling effect.")
-                .Type<ListType<ItemType>>()
-                .Resolver((ctx, token) =>
-                {
-                    var resolver = ctx.Service<ItemResolver>();
-                    var resourceTasks = ctx.Parent<ItemFlingEffect>()
-                        .Items
-                        .Select(item => resolver.GetItemAsync(item.Name, token));
-                    return Task.WhenAll(resourceTasks);
-                });
+            descriptor.UseNamedApiResourceCollectionField<ItemFlingEffect, Item, ItemType>(x => x.Items);
         }
     }
 }

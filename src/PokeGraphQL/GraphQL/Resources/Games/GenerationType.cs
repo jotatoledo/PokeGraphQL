@@ -7,8 +7,6 @@
 
 namespace PokeGraphQL.GraphQL.Resources.Games
 {
-    using System.Linq;
-    using System.Threading.Tasks;
     using HotChocolate.Types;
     using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources.Locations;
@@ -22,66 +20,12 @@ namespace PokeGraphQL.GraphQL.Resources.Games
         {
             descriptor.Description(@"A generation is a grouping of the Pokémon games that separates them based on the Pokémon they include.
                 In each generation, a new set of Pokémon, Moves, Abilities and Types that did not exist in the previous generation are released.");
-            descriptor.Field(x => x.Abilities)
-                .Description("A list of abilities that were introduced in this generation.")
-                .Type<ListType<AbilityType>>()
-                .Resolver((ctx, token) =>
-                {
-                    var resolver = ctx.Service<PokemonResolver>();
-                    var resourceTasks = ctx.Parent<Generation>()
-                        .Abilities
-                        .Select(ability => resolver.GetAbilityAsync(ability.Name, token));
-                    return Task.WhenAll(resourceTasks);
-                });
-            descriptor.Field(x => x.MainRegion)
-                .Description("The main region travelled in this generation.")
-                .Type<RegionType>()
-                .Resolver((ctx, token) => ctx.Service<LocationResolver>().GetRegionAsync(ctx.Parent<Generation>().MainRegion.Name, token));
-            descriptor.Field(x => x.Moves)
-                .Description("A list of moves that were introduced in this generation.")
-                .Type<ListType<MoveType>>()
-                .Resolver((ctx, token) =>
-                {
-                    var resolver = ctx.Service<MoveResolver>();
-                    var resourceTasks = ctx.Parent<Generation>()
-                        .Moves
-                        .Select(move => resolver.GetMoveAsync(move.Name, token));
-                    return Task.WhenAll(resourceTasks);
-                });
-            descriptor.Field(x => x.PokemonSpecies)
-                .Name("pokemonSpecies")
-                .Description("A list of pokémon species that were introduced in this generation.")
-                .Type<ListType<PokemonSpeciesType>>()
-                .Resolver((ctx, token) =>
-                {
-                    var resolver = ctx.Service<PokemonResolver>();
-                    var resourceTasks = ctx.Parent<Generation>()
-                        .PokemonSpecies
-                        .Select(species => resolver.GetPokemonSpeciesAsync(species.Name, token));
-                    return Task.WhenAll(resourceTasks);
-                });
-            descriptor.Field(x => x.Types)
-                .Description("A list of types that were introduced in this generation.")
-                .Type<ListType<TypePropertyType>>()
-                .Resolver((ctx, token) =>
-                {
-                    var resolver = ctx.Service<PokemonResolver>();
-                    var resourceTasks = ctx.Parent<Generation>()
-                        .Types
-                        .Select(type => resolver.GetTypeAsync(type.Name, token));
-                    return Task.WhenAll(resourceTasks);
-                });
-            descriptor.Field(x => x.VersionGroups)
-                .Description("A list of version groups that were introduced in this generation.")
-                .Type<ListType<VersionGroupType>>()
-                .Resolver((ctx, token) =>
-                {
-                    var resolver = ctx.Service<GameResolver>();
-                    var resourceTasks = ctx.Parent<Generation>()
-                    .VersionGroups
-                    .Select(versionGroup => resolver.GetVersionGroupAsync(versionGroup.Name, token));
-                    return Task.WhenAll(resourceTasks);
-                });
+            descriptor.UseNamedApiResourceCollectionField<Generation, Ability, AbilityType>(x => x.Abilities);
+            descriptor.UseNamedApiResourceField<Generation, Region, RegionType>(x => x.MainRegion);
+            descriptor.UseNamedApiResourceCollectionField<Generation, Move, MoveType>(x => x.Moves);
+            descriptor.UseNamedApiResourceCollectionField<Generation, PokemonSpecies, PokemonSpeciesType>(x => x.PokemonSpecies);
+            descriptor.UseNamedApiResourceCollectionField<Generation, Type, TypePropertyType>(x => x.Types);
+            descriptor.UseNamedApiResourceCollectionField<Generation, VersionGroup, VersionGroupType>(x => x.VersionGroups);
         }
     }
 }

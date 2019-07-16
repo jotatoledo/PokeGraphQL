@@ -13,7 +13,7 @@ namespace PokeGraphQL.GraphQL
     using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources;
 
-    internal static class ObjectTypeDescriptorExtensions
+    internal static class ObjectTypeDescriptorRootResourceExtensions
     {
         internal static IObjectFieldDescriptor UseApiResource<TResourceType, TSchemaType>(this IObjectFieldDescriptor descriptor)
             where TResourceType : ApiResource

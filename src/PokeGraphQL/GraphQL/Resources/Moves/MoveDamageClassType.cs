@@ -7,8 +7,6 @@
 
 namespace PokeGraphQL.GraphQL.Resources.Moves
 {
-    using System.Linq;
-    using System.Threading.Tasks;
     using HotChocolate.Types;
     using PokeApiNet.Models;
 
@@ -19,17 +17,7 @@ namespace PokeGraphQL.GraphQL.Resources.Moves
         {
             descriptor.Description("Damage classes moves can have, e.g. physical, special, or status (non-damaging).");
             descriptor.Ignore(x => x.Descriptions);
-            descriptor.Field(x => x.Moves)
-                .Description("A list of moves that fall into this damage class.")
-                .Type<ListType<MoveType>>()
-                .Resolver((ctx, token) =>
-                {
-                    var resolver = ctx.Service<MoveResolver>();
-                    var resourceTasks = ctx.Parent<MoveDamageClass>()
-                        .Moves
-                        .Select(move => resolver.GetMoveAsync(move.Name, token));
-                    return Task.WhenAll(resourceTasks);
-                });
+            descriptor.UseNamedApiResourceCollectionField<MoveDamageClass, Move, MoveType>(x => x.Moves);
         }
     }
 }

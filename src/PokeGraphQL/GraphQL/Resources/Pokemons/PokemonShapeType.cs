@@ -22,6 +22,8 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
             descriptor.Field(x => x.AwesomeNames)
                 .Description("The \"scientific\" name of this pokémon shape listed in different languages.")
                 .Type<ListType<AwesomeNameType>>();
+
+            // TODO refactor once type in upstream is changed to List<NamedApiResource<PokemonSpecies>>
             descriptor.Field(x => x.PokemonSpecies)
                 .Description("A list of the pokémon species that have this shape.")
                 .Type<ListType<PokemonSpeciesType>>()
@@ -41,10 +43,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
             {
                 descriptor.Field(x => x.AwesomeName)
                     .Description("The localized \"scientific\" name for an API resource in a specific language.");
-                descriptor.Field(x => x.Language)
-                    .Description("The language this \"scientific\" name is in.")
-                    .Type<LanguageType>()
-                    .Resolver((ctx, token) => ctx.Service<LanguageResolver>().GetLanguageAsync(ctx.Parent<AwesomeNames>().Language.Name, token));
+                descriptor.UseNamedApiResourceField<AwesomeNames, Language, LanguageType>(x => x.Language);
             }
         }
     }

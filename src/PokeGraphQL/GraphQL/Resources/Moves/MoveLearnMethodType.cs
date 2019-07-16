@@ -7,8 +7,6 @@
 
 namespace PokeGraphQL.GraphQL.Resources.Moves
 {
-    using System.Linq;
-    using System.Threading.Tasks;
     using HotChocolate.Types;
     using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources.Games;
@@ -20,17 +18,7 @@ namespace PokeGraphQL.GraphQL.Resources.Moves
         {
             descriptor.Description("Methods by which pokémon can learn moves.");
             descriptor.Ignore(x => x.Descriptions);
-            descriptor.Field(x => x.VersionGroups)
-                .Description("A list of version groups where moves can be learned through this method.")
-                .Type<ListType<VersionGroupType>>()
-                .Resolver((ctx, token) =>
-                {
-                    var resolver = ctx.Service<GameResolver>();
-                    var resourceTasks = ctx.Parent<MoveLearnMethod>()
-                        .VersionGroups
-                        .Select(versionGroup => resolver.GetVersionGroupAsync(versionGroup.Name, token));
-                    return Task.WhenAll(resourceTasks);
-                });
+            descriptor.UseNamedApiResourceCollectionField<MoveLearnMethod, VersionGroup, VersionGroupType>(x => x.VersionGroups);
         }
     }
 }

@@ -7,8 +7,6 @@
 
 namespace PokeGraphQL.GraphQL.Resources.Pokemons
 {
-    using System.Linq;
-    using System.Threading.Tasks;
     using HotChocolate.Types;
     using PokeApiNet.Models;
 
@@ -22,17 +20,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
             descriptor.Field(x => x.PokemonSpeciesDetails)
                 .Description("A list of pokémon species that can be this gender and how likely it is that they will be.")
                 .Type<ListType<PokemonSpeciesGenderType>>();
-            descriptor.Field(x => x.RequiredForEvolution)
-                .Description("A list of pokémon species that required this gender in order for a pokémon to evolve into them")
-                .Type<ListType<PokemonSpeciesType>>()
-                .Resolver((ctx, token) =>
-                {
-                    var resolver = ctx.Service<PokemonResolver>();
-                    var resourceTasks = ctx.Parent<Gender>()
-                        .RequiredForEvolution
-                        .Select(species => resolver.GetPokemonSpeciesAsync(species.Name, token));
-                    return Task.WhenAll(resourceTasks);
-                });
+            descriptor.UseNamedApiResourceCollectionField<Gender, PokemonSpecies, PokemonSpeciesType>(x => x.RequiredForEvolution);
         }
 
         private sealed class PokemonSpeciesGenderType : ObjectType<PokemonSpeciesGender>
@@ -42,10 +30,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
                 descriptor.Field(x => x.Rate)
                     .Name("genderRate")
                     .Description("The chance of this Pokémon being female, in eighths; or -1 for genderless.");
-                descriptor.Field(x => x.PokemonSpecies)
-                    .Description("A pokemon species that can be the referenced gender")
-                    .Type<PokemonSpeciesType>()
-                    .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetPokemonSpeciesAsync(ctx.Parent<PokemonSpeciesGender>().PokemonSpecies.Name, token));
+                descriptor.UseNamedApiResourceField<PokemonSpeciesGender, PokemonSpecies, PokemonSpeciesType>(x => x.PokemonSpecies);
             }
         }
     }

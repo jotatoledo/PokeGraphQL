@@ -57,7 +57,7 @@ namespace PokeGraphQL.GraphQL.Resources
         private static Func<TResource, int, Edge<TResource>> CreateEdgeFactory<TResource>(int pageSize) =>
             (resource, index) => new Edge<TResource>(SerializeCursor(pageSize + index), resource);
 
-        internal sealed class Cursor
+        private sealed class Cursor
         {
             public int OffSet { get; set; }
         }

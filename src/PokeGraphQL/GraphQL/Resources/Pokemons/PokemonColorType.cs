@@ -7,8 +7,6 @@
 
 namespace PokeGraphQL.GraphQL.Resources.Pokemons
 {
-    using System.Linq;
-    using System.Threading.Tasks;
     using HotChocolate.Types;
     using PokeApiNet.Models;
 
@@ -20,17 +18,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
             descriptor.Description(@"Colors used for sorting pokémon in a pokédex. 
                 The color listed in the Pokédex is usually the color most apparent or covering each Pokémon's body. 
                 No orange category exists; Pokémon that are primarily orange are listed as red or brown.");
-            descriptor.Field(x => x.PokemonSpecies)
-                .Description("A list of the pokémon species that have this color.")
-                .Type<ListType<PokemonSpeciesType>>()
-                .Resolver((ctx, token) =>
-                {
-                    var resolver = ctx.Service<PokemonResolver>();
-                    var resourceTasks = ctx.Parent<PokemonColor>()
-                        .PokemonSpecies
-                        .Select(species => resolver.GetPokemonSpeciesAsync(species.Name, token));
-                    return Task.WhenAll(resourceTasks);
-                });
+            descriptor.UseNamedApiResourceCollectionField<PokemonColor, PokemonSpecies, PokemonSpeciesType>(x => x.PokemonSpecies);
         }
     }
 }

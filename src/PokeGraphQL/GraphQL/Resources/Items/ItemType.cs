@@ -7,14 +7,10 @@
 
 namespace PokeGraphQL.GraphQL.Resources.Items
 {
-    using System;
-    using System.Linq;
-    using System.Threading.Tasks;
     using HotChocolate.Types;
     using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources.Common;
     using PokeGraphQL.GraphQL.Resources.Evolutions;
-    using PokeGraphQL.GraphQL.Resources.Pokemons;
     using PokemonType = PokeGraphQL.GraphQL.Resources.Pokemons.PokemonType;
 
     internal sealed class ItemType : BaseNamedApiObjectType<Item>
@@ -28,21 +24,10 @@ namespace PokeGraphQL.GraphQL.Resources.Items
                 .Description("The price of this item in stores.");
             descriptor.Field(x => x.FlingPower)
                 .Description("The power of the move Fling when used with this item.");
-            descriptor.Field(x => x.FlingEffect)
-                .Description("The effect of the move Fling when used with this item.")
-                .Type<ItemFlingEffectType>()
-                .Resolver((ctx, token) => ctx.Service<ItemResolver>().GetFlingEffectAsync(ctx.Parent<Item>().FlingEffect.Name, token));
-            descriptor.Field(x => x.Attributes)
-                .Description("A list of attributes this item has.")
-                .Type<ListType<ItemAttributeType>>()
-                .Resolver((ctx, token) =>
-                {
-                    var resolver = ctx.Service<ItemResolver>();
-                    var resourceTasks = ctx.Parent<Item>()
-                        .Attributes
-                        .Select(attribute => resolver.GetAttributeAsync(attribute.Name, token));
-                    return Task.WhenAll(resourceTasks);
-                });
+            descriptor.UseNullableNamedApiResourceField<Item, ItemFlingEffect, ItemFlingEffectType>(x => x.FlingEffect);
+            descriptor.UseNamedApiResourceCollectionField<Item, ItemAttribute, ItemAttributeType>(x => x.Attributes);
+
+            // TODO change type in upstream to NamedApiResource<ItemCategor>, refactor once its done
             descriptor.Field(x => x.Category)
                 .Description("The category of items this item falls into.")
                 .Type<ItemCategoryType>()
@@ -53,10 +38,7 @@ namespace PokeGraphQL.GraphQL.Resources.Items
             descriptor.Field(x => x.GameIndices)
                 .Description("A list of game indices relevent to this item by generation.")
                 .Type<ListType<GenerationGameIndexType>>();
-            descriptor.Field(x => x.BabyTriggerFor)
-                .Description("An evolution chain this item requires to produce a bay during mating.")
-                .Type<EvolutionChainType>()
-                .Resolver((ctx, token) => ctx.Service<EvolutionResolver>().GetEvolutionChainAsync(Convert.ToInt32(ctx.Parent<Item>().BabyTriggerFor.Url), token));
+            descriptor.UseNullableApiResourceField<Item, EvolutionChain, EvolutionChainType>(x => x.BabyTriggerFor);
             descriptor.Field(x => x.EffectEntries)
                 .Description("The effect of this ability listed in different languages.")
                 .Type<ListType<VerboseEffectType>>();
@@ -70,10 +52,7 @@ namespace PokeGraphQL.GraphQL.Resources.Items
             /// <inheritdoc/>
             protected override void Configure(IObjectTypeDescriptor<ItemHolderPokemon> descriptor)
             {
-                descriptor.Field(x => x.Pokemon)
-                    .Description("The pokemon who might be holding the item.")
-                    .Type<PokemonType>()
-                    .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetPokemonAsync(ctx.Parent<ItemHolderPokemon>().Pokemon.Name, token));
+                descriptor.UseNamedApiResourceField<ItemHolderPokemon, Pokemon, PokemonType>(x => x.Pokemon);
                 descriptor.Field(x => x.VersionDetails)
                     .Description("Details on chance of the pokemon having the item based on version.")
                     .Type<ListType<HeldItemVersionDetailsType>>();

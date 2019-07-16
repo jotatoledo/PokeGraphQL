@@ -20,10 +20,7 @@ namespace PokeGraphQL.GraphQL.Resources.Common
                 .Description("The localized effect text for an api resource in a specific language.");
             descriptor.Field(x => x.ShortEffect)
                 .Description("The localized effect text in brief.");
-            descriptor.Field(x => x.Language)
-                .Description("The language this effect is in.")
-                .Type<LanguageType>()
-                .Resolver((ctx, token) => ctx.Service<LanguageResolver>().GetLanguageAsync(ctx.Parent<VerboseEffect>().Language.Name, token));
+            descriptor.UseNamedApiResourceField<VerboseEffect, Language, LanguageType>(x => x.Language);
         }
     }
 }

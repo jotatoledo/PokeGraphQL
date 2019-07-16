@@ -7,8 +7,6 @@
 
 namespace PokeGraphQL.GraphQL.Resources.Items
 {
-    using System.Linq;
-    using System.Threading.Tasks;
     using HotChocolate.Types;
     using PokeApiNet.Models;
 
@@ -18,15 +16,7 @@ namespace PokeGraphQL.GraphQL.Resources.Items
         protected override void ConcreteConfigure(IObjectTypeDescriptor<ItemAttribute> descriptor)
         {
             descriptor.Description("Item attributes define particular aspects of items, e.g. \"usable in battle\" or \"consumable\".");
-            descriptor.Field(x => x.Items)
-                .Description("A list of items that have this attribute.")
-                .Type<ListType<ItemType>>()
-                .Resolver((ctx, token) =>
-                {
-                    var resolver = ctx.Service<ItemResolver>();
-                    var resourceTasks = ctx.Parent<ItemAttribute>().Items.Select(item => resolver.GetItemAsync(item.Name, token));
-                    return Task.WhenAll(resourceTasks);
-                });
+            descriptor.UseNamedApiResourceCollectionField<ItemAttribute, Item, ItemType>(x => x.Items);
 
             // TODO add missing field
             descriptor.Ignore(x => x.Descriptions);

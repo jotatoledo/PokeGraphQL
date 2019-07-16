@@ -28,10 +28,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
             {
                 descriptor.Field(x => x.MaxChange)
                     .Description("The maximum amount of change to the referenced pokéathlon stat.");
-                descriptor.Field(x => x.Nature)
-                    .Description("The nature causing the change.")
-                    .Type<NatureType>()
-                    .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetNatureAsync(ctx.Parent<NaturePokeathlonStatAffect>().Nature.Name, token));
+                descriptor.UseNamedApiResourceField<NaturePokeathlonStatAffect, Nature, NatureType>(x => x.Nature);
             }
         }
 

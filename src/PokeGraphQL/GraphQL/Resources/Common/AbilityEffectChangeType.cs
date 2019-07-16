@@ -21,10 +21,7 @@ namespace PokeGraphQL.GraphQL.Resources.Common
             descriptor.Field(x => x.EffectEntries)
                 .Description("The previous effect of this ability listed in different languages.")
                 .Type<ListType<EffectsType>>();
-            descriptor.Field(x => x.VersionGroup)
-                .Description("The version group in which the previous effect of this ability originated.")
-                .Type<VersionGroupType>()
-                .Resolver((ctx, token) => ctx.Service<GameResolver>().GetVersionGroupAsync(ctx.Parent<AbilityEffectChange>().VersionGroup.Name, token));
+            descriptor.UseNamedApiResourceField<AbilityEffectChange, VersionGroup, VersionGroupType>(x => x.VersionGroup);
         }
     }
 }
