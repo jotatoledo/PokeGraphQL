@@ -9,7 +9,6 @@ namespace PokeGraphQL.GraphQL.Resources.Common
 {
     using HotChocolate.Types;
     using PokeApiNet.Models;
-    using PokeGraphQL.GraphQL.Resources.Encounters;
     using PokeGraphQL.GraphQL.Resources.Games;
 
     internal sealed class VersionEncounterDetailType : ObjectType<VersionEncounterDetail>
@@ -19,12 +18,7 @@ namespace PokeGraphQL.GraphQL.Resources.Common
         {
             descriptor.Field(x => x.EncounterDetails)
                 .Type<ListType<EncounterType>>();
-            descriptor.Field(x => x.Version)
-                .Type<VersionType>()
-                .Resolver((ctx, token) => ctx.Service<GameResolver>().GetVersionAsync(ctx.Parent<VersionEncounterDetail>().Version.Name, token));
-
-            // TODO remove once hotchocolate@9.1.0 lands
-            descriptor.Field(x => x.MaxChance);
+            descriptor.UseNamedApiResourceField<VersionEncounterDetail, Version, VersionType>(x => x.Version);
         }
     }
 }

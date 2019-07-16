@@ -20,18 +20,9 @@ namespace PokeGraphQL.GraphQL.Resources.Machines
         {
             descriptor.Description(@"Machines are the representation of items that teach moves to Pokémon. 
                 They vary from version to version, so it is not certain that one specific TM or HM corresponds to a single Machine.");
-            descriptor.Field(x => x.Item)
-                .Description("The TM or HM item that corresponds to this machine.")
-                .Type<ItemType>()
-                .Resolver((ctx, token) => ctx.Service<ItemResolver>().GetItemAsync(ctx.Parent<Machine>().Item.Name, token));
-            descriptor.Field(x => x.Move)
-                .Description("The move that is taught by this machine.")
-                .Type<MoveType>()
-                .Resolver((ctx, token) => ctx.Service<MoveResolver>().GetMoveAsync(ctx.Parent<Machine>().Move.Name, token));
-            descriptor.Field(x => x.VersionGroup)
-                .Description("The version group that this machine applies to.")
-                .Type<VersionGroupType>()
-                .Resolver((ctx, token) => ctx.Service<GameResolver>().GetVersionGroupAsync(ctx.Parent<Machine>().VersionGroup.Name, token));
+            descriptor.UseNamedApiResourceField<Machine, Item, ItemType>(x => x.Item);
+            descriptor.UseNamedApiResourceField<Machine, Move, MoveType>(x => x.Move);
+            descriptor.UseNamedApiResourceField<Machine, VersionGroup, VersionGroupType>(x => x.VersionGroup);
         }
     }
 }

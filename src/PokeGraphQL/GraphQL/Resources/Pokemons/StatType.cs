@@ -7,9 +7,6 @@
 
 namespace PokeGraphQL.GraphQL.Resources.Pokemons
 {
-    using System;
-    using System.Linq;
-    using System.Threading.Tasks;
     using HotChocolate.Types;
     using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources.Moves;
@@ -31,49 +28,16 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
             descriptor.Field(x => x.AffectingNatures)
                 .Description("A detail of natures which affect this stat positively or negatively.")
                 .Type<NatureStatAffectSetsType>();
-            descriptor.Field(x => x.Characteristics)
-                .Description("A list of characteristics that are set on a pokemon when its highest base stat is this stat.")
-                .Type<ListType<CharacteristicType>>()
-                .Resolver((ctx, token) =>
-                {
-                    var resolver = ctx.Service<PokemonResolver>();
-                    var resourceTasks = ctx.Parent<Stat>()
-                        .Characteristics
-                        .Select(characteristic => resolver.GetCharacteristicAsync(Convert.ToInt32(characteristic.Url.LastSegment()), token));
-                    return Task.WhenAll(resourceTasks);
-                });
-            descriptor.Field(x => x.MoveDamageClass)
-                .Description("The class of damage this stat is directly related to.")
-                .Type<MoveDamageClassType>()
-                .Resolver((ctx, token) => ctx.Service<MoveResolver>().GetMoveDamageClassAsync(ctx.Parent<Stat>().MoveDamageClass.Name, token));
+            descriptor.UseApiResourceCollectionField<Stat, Characteristic, CharacteristicType>(x => x.Characteristics);
+            descriptor.UseNamedApiResourceField<Stat, MoveDamageClass, MoveDamageClassType>(x => x.MoveDamageClass);
         }
 
         private sealed class NatureStatAffectSetsType : ObjectType<NatureStatAffectSets>
         {
             protected override void Configure(IObjectTypeDescriptor<NatureStatAffectSets> descriptor)
             {
-                descriptor.Field(x => x.Increase)
-                    .Description("A list of natures and how they change the referenced stat.")
-                    .Type<ListType<NatureType>>()
-                    .Resolver((ctx, token) =>
-                    {
-                        var resolver = ctx.Service<PokemonResolver>();
-                        var resourceTasks = ctx.Parent<NatureStatAffectSets>()
-                            .Increase
-                            .Select(nature => resolver.GetNatureAsync(nature.Name, token));
-                        return Task.WhenAll(resourceTasks);
-                    });
-                descriptor.Field(x => x.Decrease)
-                    .Description("A list of natures and how they change the referenced stat.")
-                    .Type<ListType<NatureType>>()
-                    .Resolver((ctx, token) =>
-                    {
-                        var resolver = ctx.Service<PokemonResolver>();
-                        var resourceTasks = ctx.Parent<NatureStatAffectSets>()
-                            .Decrease
-                            .Select(nature => resolver.GetNatureAsync(nature.Name, token));
-                        return Task.WhenAll(resourceTasks);
-                    });
+                descriptor.UseNamedApiResourceCollectionField<NatureStatAffectSets, Nature, NatureType>(x => x.Increase);
+                descriptor.UseNamedApiResourceCollectionField<NatureStatAffectSets, Nature, NatureType>(x => x.Decrease);
             }
         }
 
@@ -83,10 +47,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
             {
                 descriptor.Field(x => x.Change)
                     .Description("The maximum amount of change to the referenced stat.");
-                descriptor.Field(x => x.Move)
-                    .Description("The move causing the change.")
-                    .Type<MoveType>()
-                    .Resolver((ctx, token) => ctx.Service<MoveResolver>().GetMoveDamageClassAsync(ctx.Parent<MoveStatAffect>().Move.Name, token));
+                descriptor.UseNamedApiResourceField<MoveStatAffect, Move, MoveType>(x => x.Move);
             }
         }
 

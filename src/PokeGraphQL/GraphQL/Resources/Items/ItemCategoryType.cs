@@ -7,8 +7,6 @@
 
 namespace PokeGraphQL.GraphQL.Resources.Items
 {
-    using System.Linq;
-    using System.Threading.Tasks;
     using HotChocolate.Types;
     using PokeApiNet.Models;
 
@@ -18,19 +16,8 @@ namespace PokeGraphQL.GraphQL.Resources.Items
         protected override void ConcreteConfigure(IObjectTypeDescriptor<ItemCategory> descriptor)
         {
             descriptor.Description("Item categories determine where items will be placed in the players bag.");
-            descriptor.Field(x => x.Items)
-                .Description("A list of items that are a part of this category.")
-                .Type<ListType<ItemType>>()
-                .Resolver((ctx, token) =>
-                {
-                    var resolver = ctx.Service<ItemResolver>();
-                    var resourceTasks = ctx.Parent<ItemCategory>().Items.Select(item => resolver.GetItemAsync(item.Name, token));
-                    return Task.WhenAll(resourceTasks);
-                });
-            descriptor.Field(x => x.Pocket)
-                .Description("The pocket items in this category would be put in.")
-                .Type<ItemPocketType>()
-                .Resolver((ctx, token) => ctx.Service<ItemResolver>().GetPocketAsync(ctx.Parent<ItemCategory>().Pocket.Name, token));
+            descriptor.UseNamedApiResourceCollectionField<ItemCategory, Item, ItemType>(x => x.Items);
+            descriptor.UseNamedApiResourceField<ItemCategory, ItemPocket, ItemPocketType>(x => x.Pocket);
         }
     }
 }

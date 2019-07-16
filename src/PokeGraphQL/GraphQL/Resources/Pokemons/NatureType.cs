@@ -20,23 +20,11 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
             descriptor.Description("Natures influence how a pokémon's stats grow.");
 
             // TODO fix typo in upstream
-            descriptor.Field(x => x.DescreasedStat)
-                .Name("decreasedStat")
-                .Description("The stat decreased by 10% in pokémon with this nature.")
-                .Type<StatType>()
-                .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetStatAsync(ctx.Parent<Nature>().DescreasedStat.Name, token));
-            descriptor.Field(x => x.IncreasedStat)
-                .Description("The stat increased by 10% in pokémon with this nature.")
-                .Type<StatType>()
-                .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetStatAsync(ctx.Parent<Nature>().IncreasedStat.Name, token));
-            descriptor.Field(x => x.HatesFlavor)
-                .Description("The flavor hated by pokémon with this nature.")
-                .Type<BerryFlavorType>()
-                .Resolver((ctx, token) => ctx.Service<BerryResolver>().GetBerryFlavorAsync(ctx.Parent<Nature>().HatesFlavor.Name, token));
-            descriptor.Field(x => x.LikesFlavor)
-                .Description("The flavor liked by pokémon with this nature.")
-                .Type<BerryFlavorType>()
-                .Resolver((ctx, token) => ctx.Service<BerryResolver>().GetBerryFlavorAsync(ctx.Parent<Nature>().LikesFlavor.Name, token));
+            descriptor.UseNamedApiResourceField<Nature, Stat, StatType>(x => x.DescreasedStat)
+                .Name("decreasedStat");
+            descriptor.UseNamedApiResourceField<Nature, Stat, StatType>(x => x.IncreasedStat);
+            descriptor.UseNamedApiResourceField<Nature, BerryFlavor, BerryFlavorType>(x => x.HatesFlavor);
+            descriptor.UseNamedApiResourceField<Nature, BerryFlavor, BerryFlavorType>(x => x.LikesFlavor);
             descriptor.Field(x => x.PokeathlonStatChanges)
                 .Description("A list of pokéathlon stats this nature effects and how much it effects them.")
                 .Type<ListType<NatureStatChangeType>>();
@@ -54,10 +42,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
                 descriptor.Field(x => x.HighHpPreference)
                     .Name("highHpPreference")
                     .Description("Chance of using the move, in percent, if HP is over one half.");
-                descriptor.Field(x => x.MoveBattleStyle)
-                    .Description("The move battle style.")
-                    .Type<MoveBattleStyleType>()
-                    .Resolver((ctx, token) => ctx.Service<MoveResolver>().GetMoveBattleStyleAsync(ctx.Parent<MoveBattleStylePreference>().MoveBattleStyle.Name, token));
+                descriptor.UseNamedApiResourceField<MoveBattleStylePreference, MoveBattleStyle, MoveBattleStyleType>(x => x.MoveBattleStyle);
             }
         }
 

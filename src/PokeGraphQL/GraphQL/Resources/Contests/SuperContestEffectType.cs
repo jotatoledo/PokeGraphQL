@@ -7,8 +7,6 @@
 
 namespace PokeGraphQL.GraphQL.Resources.Contests
 {
-    using System.Linq;
-    using System.Threading.Tasks;
     using HotChocolate.Types;
     using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources.Common;
@@ -22,17 +20,7 @@ namespace PokeGraphQL.GraphQL.Resources.Contests
             descriptor.Description("Super contest effects refer to the effects of moves when used in super contests.");
             descriptor.Field(x => x.Appeal)
                 .Description("The level of appeal this super contest effect has.");
-            descriptor.Field(x => x.Moves)
-                .Description("The result of this contest effect listed in different languages.")
-                .Type<ListType<MoveType>>()
-                .Resolver((ctx, token) =>
-                {
-                    var resolver = ctx.Service<MoveResolver>();
-                    var resourceTasks = ctx.Parent<SuperContestEffect>()
-                        .Moves
-                        .Select(move => resolver.GetMoveAsync(move.Name, token));
-                    return Task.WhenAll(resourceTasks);
-                });
+            descriptor.UseNamedApiResourceCollectionField<SuperContestEffect, Move, MoveType>(x => x.Moves);
             descriptor.Field(x => x.FlavorTextEntries)
                 .Description("The flavor text of this contest effect listed in different languages.")
                 .Type<ListType<FlavorTextType>>();

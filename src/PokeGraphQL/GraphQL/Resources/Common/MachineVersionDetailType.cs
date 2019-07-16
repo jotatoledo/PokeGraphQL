@@ -7,7 +7,6 @@
 
 namespace PokeGraphQL.GraphQL.Resources.Common
 {
-    using System;
     using HotChocolate.Types;
     using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources.Games;
@@ -18,14 +17,8 @@ namespace PokeGraphQL.GraphQL.Resources.Common
         /// <inheritdoc/>
         protected override void Configure(IObjectTypeDescriptor<MachineVersionDetail> descriptor)
         {
-            descriptor.Field(x => x.Machine)
-                .Description("The machine that teaches a move from an item.")
-                .Type<MachineType>()
-                .Resolver((ctx, token) => ctx.Service<MachineResolver>().GetMachineAsync(Convert.ToInt32(ctx.Parent<MachineVersionDetail>().Machine.Url.LastSegment()), token));
-            descriptor.Field(x => x.VersionGroup)
-                .Description("The version group of this specific machine.")
-                .Type<VersionGroupType>()
-                .Resolver((ctx, token) => ctx.Service<GameResolver>().GetVersionGroupAsync(ctx.Parent<MachineVersionDetail>().VersionGroup.Name, token));
+            descriptor.UseApiResourceField<MachineVersionDetail, Machine, MachineType>(x => x.Machine);
+            descriptor.UseNamedApiResourceField<MachineVersionDetail, VersionGroup, VersionGroupType>(x => x.VersionGroup);
         }
     }
 }

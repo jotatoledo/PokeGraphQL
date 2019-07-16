@@ -7,9 +7,6 @@
 
 namespace PokeGraphQL.GraphQL.Resources.Pokemons
 {
-    using System;
-    using System.Linq;
-    using System.Threading.Tasks;
     using HotChocolate.Types;
     using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources.Common;
@@ -44,48 +41,17 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
                 .Description("Whether or not this pokémon can have different genders.");
             descriptor.Field(x => x.FormsSwitchable)
                 .Description("Whether or not this pokémon has multiple forms and can switch between them.");
-            descriptor.Field(x => x.GrowthRate)
-                .Description("The rate at which this pokémon species gains levels.")
-                .Type<GrowthRateType>()
-                .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetGrowthRateAsync(ctx.Parent<PokemonSpecies>().GrowthRate.Name, token));
+            descriptor.UseNamedApiResourceField<PokemonSpecies, GrowthRate, GrowthRateType>(x => x.GrowthRate);
             descriptor.Field(x => x.PokedexNumbers)
                 .Description("A list of pokedexes and the indexes reserved within them for this pokémon species.")
                 .Type<ListType<PokemonSpeciesDexEntryType>>();
-            descriptor.Field(x => x.EggGroups)
-                .Description("A list of egg groups this pokémon species is a member of.")
-                .Type<ListType<EggGroupType>>()
-                .Resolver((ctx, token) =>
-                {
-                    var resolver = ctx.Service<PokemonResolver>();
-                    var resourceTasks = ctx.Parent<PokemonSpecies>()
-                        .EggGroups
-                        .Select(eggGroup => resolver.GetEggGroupAsync(eggGroup.Name, token));
-                    return Task.WhenAll(resourceTasks);
-                });
-            descriptor.Field(x => x.Color)
-                .Description("The color of this pokémon for gimmicky pokedex search.")
-                .Type<PokemonColorType>()
-                .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetPokemonColorAsync(ctx.Parent<PokemonSpecies>().Color.Name, token));
-            descriptor.Field(x => x.Shape)
-                .Description("The shape of this pokémon for gimmicky pokedex search.")
-                .Type<PokemonShapeType>()
-                .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetPokemonShapeAsync(ctx.Parent<PokemonSpecies>().Shape.Name, token));
-            descriptor.Field(x => x.EvolvesFromSpecies)
-                .Description("The pokémon species that evolves into this species.")
-                .Type<PokemonSpeciesType>()
-                .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetPokemonSpeciesAsync(ctx.Parent<PokemonSpecies>().EvolvesFromSpecies.Name, token));
-            descriptor.Field(x => x.EvolutionChain)
-                .Description("The evolution chain this pokémon species is a member of.")
-                .Type<EvolutionChainType>()
-                .Resolver((ctx, token) => ctx.Service<EvolutionResolver>().GetEvolutionChainAsync(Convert.ToInt32(ctx.Parent<PokemonSpecies>().EvolutionChain.Url.LastSegment()), token));
-            descriptor.Field(x => x.Habitat)
-                .Description("The habitat this pokémon species can be encountered in.")
-                .Type<PokemonHabitatType>()
-                .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetPokemonHabitatAsync(ctx.Parent<PokemonSpecies>().Habitat.Name, token));
-            descriptor.Field(x => x.Generation)
-                .Description("The generation this pokémon species was introduced in.")
-                .Type<GenerationType>()
-                .Resolver((ctx, token) => ctx.Service<GameResolver>().GetGenerationAsync(ctx.Parent<PokemonSpecies>().Generation.Name, token));
+            descriptor.UseNamedApiResourceCollectionField<PokemonSpecies, EggGroup, EggGroupType>(x => x.EggGroups);
+            descriptor.UseNamedApiResourceField<PokemonSpecies, PokemonColor, PokemonColorType>(x => x.Color);
+            descriptor.UseNamedApiResourceField<PokemonSpecies, PokemonShape, PokemonShapeType>(x => x.Shape);
+            descriptor.UseNullableNamedApiResourceField<PokemonSpecies, PokemonSpecies, PokemonSpeciesType>(x => x.EvolvesFromSpecies);
+            descriptor.UseApiResourceField<PokemonSpecies, EvolutionChain, EvolutionChainType>(x => x.EvolutionChain);
+            descriptor.UseNamedApiResourceField<PokemonSpecies, PokemonHabitat, PokemonHabitatType>(x => x.Habitat);
+            descriptor.UseNamedApiResourceField<PokemonSpecies, Generation, GenerationType>(x => x.Generation);
             descriptor.Field(x => x.PalParkEncounters)
                 .Description("A list of encounters that can be had with this pokémon species in pal park.")
                 .Type<ListType<PalParkEncounterAreaType>>();
@@ -107,9 +73,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
             protected override void Configure(IObjectTypeDescriptor<PokemonSpeciesVariety> descriptor)
             {
                 descriptor.Field(x => x.IsDefault);
-                descriptor.Field(x => x.Pokemon)
-                    .Type<PokemonType>()
-                    .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetPokemonAsync(ctx.Parent<PokemonSpeciesVariety>().Pokemon.Name, token));
+                descriptor.UseNamedApiResourceField<PokemonSpeciesVariety, Pokemon, PokemonType>(x => x.Pokemon);
             }
         }
 
@@ -119,10 +83,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
             {
                 descriptor.Field(x => x.EntryNumber)
                     .Description("The index number within the pokédex.");
-                descriptor.Field(x => x.Pokedex)
-                    .Description("The pokédex the referenced pokémon species can be found in.")
-                    .Type<PokedexType>()
-                    .Resolver((ctx, token) => ctx.Service<GameResolver>().GetPokedexAsync(ctx.Parent<PokemonSpeciesDexEntry>().Pokedex.Name, token));
+                descriptor.UseNamedApiResourceField<PokemonSpeciesDexEntry, Pokedex, PokedexType>(x => x.Pokedex);
             }
         }
 
@@ -132,10 +93,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
             {
                 descriptor.Field(x => x.Genus)
                     .Description("The localized genus for the referenced pokémon species.");
-                descriptor.Field(x => x.Language)
-                    .Description("The language this genus is in.")
-                    .Type<LanguageType>()
-                    .Resolver((ctx, token) => ctx.Service<LanguageResolver>().GetLanguageAsync(ctx.Parent<Genuses>().Language.Name, token));
+                descriptor.UseNamedApiResourceField<Genuses, Language, LanguageType>(x => x.Language);
             }
         }
 
@@ -148,10 +106,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
                     .Description("The base score given to the player when the referenced pokemon is caught during a pal park run.");
                 descriptor.Field(x => x.Rate)
                     .Description("	The base rate for encountering the referenced pokemon in this pal park area.");
-                descriptor.Field(x => x.Area)
-                    .Description("The pal park area where this encounter happens.")
-                    .Type<PalParkAreaType>()
-                    .Resolver((ctx, token) => ctx.Service<LocationResolver>().GetPalParkAreaAsync(ctx.Parent<PalParkEncounterArea>().Area.Name, token));
+                descriptor.UseNamedApiResourceField<PalParkEncounterArea, PalParkArea, PalParkAreaType>(x => x.Area);
             }
         }
     }

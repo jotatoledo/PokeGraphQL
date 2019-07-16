@@ -7,8 +7,6 @@
 
 namespace PokeGraphQL.GraphQL.Resources.Moves
 {
-    using System.Linq;
-    using System.Threading.Tasks;
     using HotChocolate.Types;
     using PokeApiNet.Models;
 
@@ -18,17 +16,7 @@ namespace PokeGraphQL.GraphQL.Resources.Moves
         protected override void ConcreteConfigure(IObjectTypeDescriptor<MoveAilment> descriptor)
         {
             descriptor.Description("Move Ailments are status conditions caused by moves used during battle.");
-            descriptor.Field(x => x.Moves)
-                .Description("A list of moves that cause this ailment.")
-                .Type<ListType<MoveType>>()
-                .Resolver((ctx, token) =>
-                {
-                    var resolver = ctx.Service<MoveResolver>();
-                    var resourceTasks = ctx.Parent<MoveAilment>()
-                        .Moves
-                        .Select(move => resolver.GetMoveAsync(move.Name, token));
-                    return Task.WhenAll(resourceTasks);
-                });
+            descriptor.UseNamedApiResourceCollectionField<MoveAilment, Move, MoveType>(x => x.Moves);
         }
     }
 }

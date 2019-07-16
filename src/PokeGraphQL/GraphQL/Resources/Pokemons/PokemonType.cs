@@ -7,9 +7,6 @@
 
 namespace PokeGraphQL.GraphQL.Resources.Pokemons
 {
-    using System;
-    using System.Linq;
-    using System.Threading.Tasks;
     using HotChocolate.Types;
     using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources.Common;
@@ -39,21 +36,8 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
             descriptor.Field(x => x.Abilities)
                 .Description("A list of abilities this pokémon could potentially have.")
                 .Type<ListType<PokemonAbilityType>>();
-            descriptor.Field(x => x.Forms)
-                .Description("A list of forms this pokémon can take on.")
-                .Type<ListType<PokemonFormType>>()
-                .Resolver((ctx, token) =>
-                {
-                    var resolver = ctx.Service<PokemonResolver>();
-                    var resourceTasks = ctx.Parent<Pokemon>()
-                        .Forms
-                        .Select(form => resolver.GetPokemonFormAsync(form.Name, token));
-                    return Task.WhenAll(resourceTasks);
-                });
-            descriptor.Field(x => x.Species)
-                .Description("The species this pokémon belongs to.")
-                .Type<PokemonSpeciesType>()
-                .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetPokemonSpeciesAsync(ctx.Parent<Pokemon>().Species.Name, token));
+            descriptor.UseNamedApiResourceCollectionField<Pokemon, PokemonForm, PokemonFormType>(x => x.Forms);
+            descriptor.UseNamedApiResourceField<Pokemon, PokemonSpecies, PokemonSpeciesType>(x => x.Species);
             descriptor.Field(x => x.Types)
                 .Description("A list of details showing types this pokémon has.")
                 .Type<ListType<PokemonTypeMapType>>();
@@ -79,9 +63,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
         {
             protected override void Configure(IObjectTypeDescriptor<LocationAreaEncounter> descriptor)
             {
-                descriptor.Field(x => x.LocationArea)
-                    .Type<LocationAreaType>()
-                    .Resolver((ctx, token) => ctx.Service<LocationResolver>().GetLocationAreaAsync(ctx.Parent<LocationAreaEncounter>().LocationArea.Name, token));
+                descriptor.UseNamedApiResourceField<LocationAreaEncounter, LocationArea, LocationAreaType>(x => x.LocationArea);
                 descriptor.Field(x => x.VersionDetails)
                     .Type<ListType<VersionEncounterDetailType>>();
             }
@@ -93,9 +75,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
             {
                 descriptor.Field(x => x.BaseStat);
                 descriptor.Field(x => x.Effort);
-                descriptor.Field(x => x.Stat)
-                    .Type<StatType>()
-                    .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetStatAsync(ctx.Parent<PokemonStat>().Stat.Name, token));
+                descriptor.UseNamedApiResourceField<PokemonStat, Stat, StatType>(x => x.Stat);
             }
         }
 
@@ -104,12 +84,8 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
             protected override void Configure(IObjectTypeDescriptor<PokemonMoveVersion> descriptor)
             {
                 descriptor.Field(x => x.LevelLearnedAt);
-                descriptor.Field(x => x.VersionGroup)
-                    .Type<VersionGroupType>()
-                    .Resolver((ctx, token) => ctx.Service<GameResolver>().GetVersionGroupAsync(ctx.Parent<PokemonMoveVersion>().VersionGroup.Name, token));
-                descriptor.Field(x => x.MoveLearnMethod)
-                    .Type<MoveLearnMethodType>()
-                    .Resolver((ctx, token) => ctx.Service<MoveResolver>().GetMoveLearnMethodAsync(ctx.Parent<PokemonMoveVersion>().MoveLearnMethod.Name, token));
+                descriptor.UseNamedApiResourceField<PokemonMoveVersion, VersionGroup, VersionGroupType>(x => x.VersionGroup);
+                descriptor.UseNamedApiResourceField<PokemonMoveVersion, MoveLearnMethod, MoveLearnMethodType>(x => x.MoveLearnMethod);
             }
         }
 
@@ -117,9 +93,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
         {
             protected override void Configure(IObjectTypeDescriptor<PokemonMove> descriptor)
             {
-                descriptor.Field(x => x.Move)
-                    .Type<MoveType>()
-                    .Resolver((ctx, token) => ctx.Service<MoveResolver>().GetMoveAsync(ctx.Parent<PokemonMove>().Move.Name, token));
+                descriptor.UseNamedApiResourceField<PokemonMove, Move, MoveType>(x => x.Move);
                 descriptor.Field(x => x.VersionGroupDetails)
                     .Type<ListType<PokemonMoveVersionType>>();
             }
@@ -129,10 +103,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
         {
             protected override void Configure(IObjectTypeDescriptor<PokemonHeldItem> descriptor)
             {
-                descriptor.Field(x => x.Item)
-                    .Description("The item that may be holded.")
-                    .Type<ItemType>()
-                    .Resolver((ctx, token) => ctx.Service<ItemResolver>().GetItemAsync(ctx.Parent<PokemonHeldItem>().Item.Name, token));
+                descriptor.UseNamedApiResourceField<PokemonHeldItem, Item, ItemType>(x => x.Item);
                 descriptor.Field(x => x.VersionDetails)
                     .Description("Details on chance of the pokemon having the item based on version.")
                     .Type<ListType<HeldItemVersionDetailsType>>();
@@ -147,10 +118,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
                     .Description("Whether or not this is a hidden ability.");
                 descriptor.Field(x => x.Slot)
                     .Description("The slot this ability occupies in this pokémon species.");
-                descriptor.Field(x => x.Ability)
-                    .Description("The ability the pokémon may have.")
-                    .Type<AbilityType>()
-                    .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetAbilityAsync(ctx.Parent<PokemonAbility>().Ability.Name, token));
+                descriptor.UseNamedApiResourceField<PokemonAbility, Ability, AbilityType>(x => x.Ability);
             }
         }
 
@@ -160,10 +128,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
             {
                 descriptor.Field(x => x.Slot)
                     .Description("The order the pokémon types are listed in.");
-                descriptor.Field(x => x.Type)
-                    .Description("The type the referenced pokémon has.")
-                    .Type<TypePropertyType>()
-                    .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetTypeAsync(ctx.Parent<PokeApiNet.Models.PokemonType>().Type.Name, token));
+                descriptor.UseNamedApiResourceField<PokeApiNet.Models.PokemonType, Type, TypePropertyType>(x => x.Type);
             }
         }
     }

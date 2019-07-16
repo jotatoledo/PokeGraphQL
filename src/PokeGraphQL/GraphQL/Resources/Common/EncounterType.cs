@@ -7,8 +7,6 @@
 
 namespace PokeGraphQL.GraphQL.Resources.Common
 {
-    using System.Linq;
-    using System.Threading.Tasks;
     using HotChocolate.Types;
     using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources.Encounters;
@@ -18,24 +16,8 @@ namespace PokeGraphQL.GraphQL.Resources.Common
         /// <inheritdoc/>
         protected override void Configure(IObjectTypeDescriptor<Encounter> descriptor)
         {
-            descriptor.Field(x => x.ConditionValues)
-                .Type<ListType<EncounterConditionValueType>>()
-                .Resolver((ctx, token) =>
-                {
-                    var resolver = ctx.Service<EncounterResolver>();
-                    var resourceTasks = ctx.Parent<Encounter>()
-                        .ConditionValues
-                        .Select(conditionValue => resolver.GetEncounterConditionValueAsync(conditionValue.Name, token));
-                    return Task.WhenAll(resourceTasks);
-                });
-            descriptor.Field(x => x.Method)
-                .Type<EncounterMethodType>()
-                .Resolver((ctx, token) => ctx.Service<EncounterResolver>().GetEncounterMethodAsync(ctx.Parent<Encounter>().Method.Name, token));
-
-            // TODO remove once hotchocolate@9.1.0 lands
-            descriptor.Field(x => x.MinLevel);
-            descriptor.Field(x => x.MaxLevel);
-            descriptor.Field(x => x.Chance);
+            descriptor.UseNamedApiResourceCollectionField<Encounter, EncounterConditionValue, EncounterConditionValueType>(x => x.ConditionValues);
+            descriptor.UseNamedApiResourceField<Encounter, EncounterMethod, EncounterMethodType>(x => x.Method);
         }
     }
 }

@@ -7,8 +7,6 @@
 
 namespace PokeGraphQL.GraphQL.Resources.Pokemons
 {
-    using System.Linq;
-    using System.Threading.Tasks;
     using HotChocolate.Types;
     using PokeApiNet.Models;
 
@@ -25,17 +23,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
             descriptor.Field(x => x.Levels)
                 .Description("A list of levels and the amount of experienced needed to atain them based on this growth rate.")
                 .Type<ListType<GrowthRateExperienceLevelType>>();
-            descriptor.Field(x => x.PokemonSpecies)
-                .Description("	A list of pokémon species that gain levels at this growth rate.")
-                .Type<ListType<PokemonSpeciesType>>()
-                .Resolver((ctx, token) =>
-                {
-                    var resolver = ctx.Service<PokemonResolver>();
-                    var resourceTasks = ctx.Parent<GrowthRate>()
-                        .PokemonSpecies
-                        .Select(species => resolver.GetPokemonSpeciesAsync(species.Name, token));
-                    return Task.WhenAll(resourceTasks);
-                });
+            descriptor.UseNamedApiResourceCollectionField<GrowthRate, PokemonSpecies, PokemonSpeciesType>(x => x.PokemonSpecies);
         }
 
         private sealed class GrowthRateExperienceLevelType : ObjectType<GrowthRateExperienceLevel>

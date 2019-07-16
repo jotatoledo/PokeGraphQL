@@ -18,10 +18,7 @@ namespace PokeGraphQL.GraphQL.Resources.Items
         {
             descriptor.Field(x => x.Rarity)
                 .Description("The chance of the pokemon holding the item.");
-            descriptor.Field(x => x.Version)
-                .Description("The version the rarity applies.")
-                .Type<VersionType>()
-                .Resolver((ctx, token) => ctx.Service<GameResolver>().GetVersionAsync(ctx.Parent<ItemHolderPokemonVersionDetail>().Version.Name, token));
+            descriptor.UseNamedApiResourceField<ItemHolderPokemonVersionDetail, Version, VersionType>(x => x.Version);
         }
     }
 }

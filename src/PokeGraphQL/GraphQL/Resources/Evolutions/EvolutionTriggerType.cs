@@ -7,8 +7,6 @@
 
 namespace PokeGraphQL.GraphQL.Resources.Evolutions
 {
-    using System.Linq;
-    using System.Threading.Tasks;
     using HotChocolate.Types;
     using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources.Pokemons;
@@ -19,17 +17,7 @@ namespace PokeGraphQL.GraphQL.Resources.Evolutions
         protected override void ConcreteConfigure(IObjectTypeDescriptor<EvolutionTrigger> descriptor)
         {
             descriptor.Description("Evolution triggers are the events and conditions that cause a pokémon to evolve.");
-            descriptor.Field(x => x.PokemonSpecies)
-                .Description("A list of pokémon species that result from this evolution trigger.")
-                .Type<ListType<PokemonSpeciesType>>()
-                .Resolver((ctx, token) =>
-                {
-                    var resolver = ctx.Service<PokemonResolver>();
-                    var resourceTasks = ctx.Parent<EvolutionTrigger>()
-                        .PokemonSpecies
-                        .Select(species => resolver.GetPokemonSpeciesAsync(species.Name, token));
-                    return Task.WhenAll(resourceTasks);
-                });
+            descriptor.UseNamedApiResourceCollectionField<EvolutionTrigger, PokemonSpecies, PokemonSpeciesType>(x => x.PokemonSpecies);
         }
     }
 }

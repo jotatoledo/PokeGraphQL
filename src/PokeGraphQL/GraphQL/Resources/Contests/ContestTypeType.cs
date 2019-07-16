@@ -22,10 +22,7 @@ namespace PokeGraphQL.GraphQL.Resources.Contests
             descriptor.Field(x => x.Name)
                 .Description($"The name for this {this.ResourceName} resource.")
                 .Type<NonNullType<StringType>>();
-            descriptor.Field(x => x.BerryFlavor)
-                .Description("The berry flavor that correlates with this contest type.")
-                .Type<BerryFlavorType>()
-                .Resolver((ctx, token) => ctx.Service<BerryResolver>().GetBerryFlavorAsync(ctx.Parent<ContestType>().BerryFlavor.Name, token));
+            descriptor.UseNamedApiResourceField<ContestType, BerryFlavor, BerryFlavorType>(x => x.BerryFlavor);
         }
     }
 }

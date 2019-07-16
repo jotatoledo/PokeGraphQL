@@ -7,12 +7,6 @@
 
 namespace PokeGraphQL.GraphQL.Resources.Pokemons
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using HotChocolate.Resolvers;
     using HotChocolate.Types;
     using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources.Common;
@@ -34,68 +28,25 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
             descriptor.Field(x => x.GameIndices)
                 .Description("A list of game indices relevent to this item by generation.")
                 .Type<ListType<GenerationGameIndexType>>();
-            descriptor.Field(x => x.Generation)
-                .Description("The generation this type was introduced in.")
-                .Type<GenerationType>()
-                .Resolver((ctx, token) => ctx.Service<GameResolver>().GetGenerationAsync(ctx.Parent<TypeProperty>().Generation.Name, token));
-            descriptor.Field(x => x.MoveDamageClass)
-                .Description("The class of damage inflicted by this type.")
-                .Type<MoveDamageClassType>()
-                .Resolver((ctx, token) => ctx.Service<MoveResolver>().GetMoveDamageClassAsync(ctx.Parent<TypeProperty>().MoveDamageClass.Name, token));
+            descriptor.UseNamedApiResourceField<TypeProperty, Generation, GenerationType>(x => x.Generation);
+            descriptor.UseNamedApiResourceField<TypeProperty, MoveDamageClass, MoveDamageClassType>(x => x.MoveDamageClass);
             descriptor.Field(x => x.Pokemon)
                 .Description("A list of details of pokemon that have this type.")
                 .Type<ListType<TypePokemonType>>();
-            descriptor.Field(x => x.Moves)
-                .Description("A list of moves that have this type.")
-                .Type<ListType<MoveType>>()
-                .Resolver((ctx, token) =>
-                {
-                    var resolver = ctx.Service<MoveResolver>();
-                    var resourceTasks = ctx.Parent<TypeProperty>()
-                        .Moves
-                        .Select(move => resolver.GetMoveAsync(move.Name, token));
-                    return Task.WhenAll(resourceTasks);
-                });
+            descriptor.UseNamedApiResourceCollectionField<TypeProperty, Move, MoveType>(x => x.Moves);
         }
 
         private sealed class TypeRelationsType : ObjectType<TypeRelations>
         {
             protected override void Configure(IObjectTypeDescriptor<TypeRelations> descriptor)
             {
-                descriptor.Field(x => x.NoDamageTo)
-                    .Description("A list of types this type has no effect on.")
-                    .Type<ListType<TypePropertyType>>()
-                    .Resolver(CreateResolver(source => source.NoDamageTo));
-                descriptor.Field(x => x.HalfDamageTo)
-                    .Description("A list of types this type is not very effect against.")
-                    .Type<ListType<TypePropertyType>>()
-                    .Resolver(CreateResolver(source => source.HalfDamageTo));
-                descriptor.Field(x => x.DoubleDamageTo)
-                    .Description("A list of types this type is very effect against.")
-                    .Type<ListType<TypePropertyType>>()
-                    .Resolver(CreateResolver(source => source.DoubleDamageTo));
-                descriptor.Field(x => x.NoDamageFrom)
-                    .Description("A list of types that have no effect on this type.")
-                    .Type<ListType<TypePropertyType>>()
-                    .Resolver(CreateResolver(source => source.NoDamageFrom));
-                descriptor.Field(x => x.HalfDamageFrom)
-                    .Description("A list of types that are not very effective against this type.")
-                    .Type<ListType<TypePropertyType>>()
-                    .Resolver(CreateResolver(source => source.HalfDamageFrom));
-                descriptor.Field(x => x.DoubleDamageFrom)
-                    .Description("A list of types that are very effective against this type.")
-                    .Type<ListType<TypePropertyType>>()
-                    .Resolver(CreateResolver(source => source.DoubleDamageFrom));
+                descriptor.UseNamedApiResourceCollectionField<TypeRelations, TypeProperty, TypePropertyType>(x => x.NoDamageTo);
+                descriptor.UseNamedApiResourceCollectionField<TypeRelations, TypeProperty, TypePropertyType>(x => x.HalfDamageTo);
+                descriptor.UseNamedApiResourceCollectionField<TypeRelations, TypeProperty, TypePropertyType>(x => x.DoubleDamageTo);
+                descriptor.UseNamedApiResourceCollectionField<TypeRelations, TypeProperty, TypePropertyType>(x => x.NoDamageFrom);
+                descriptor.UseNamedApiResourceCollectionField<TypeRelations, TypeProperty, TypePropertyType>(x => x.HalfDamageFrom);
+                descriptor.UseNamedApiResourceCollectionField<TypeRelations, TypeProperty, TypePropertyType>(x => x.DoubleDamageFrom);
             }
-
-            private static Func<IResolverContext, CancellationToken, Task<TypeProperty[]>> CreateResolver(Func<TypeRelations, List<NamedApiResource<TypeProperty>>> selector)
-            => (ctx, token) =>
-            {
-                var resolver = ctx.Service<PokemonResolver>();
-                var resourceTasks = selector(ctx.Parent<TypeRelations>())
-                    .Select(type => resolver.GetTypeAsync(type.Name, token));
-                return Task.WhenAll(resourceTasks);
-            };
         }
 
         private sealed class TypePokemonType : ObjectType<TypePokemon>
@@ -104,10 +55,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
             {
                 descriptor.Field(x => x.Slot)
                     .Description("The order the pokemons types are listed in.");
-                descriptor.Field(x => x.Pokemon)
-                    .Description("The pokemon that has the referenced type.")
-                    .Type<PokemonType>()
-                    .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetPokemonAsync(ctx.Parent<TypePokemon>().Pokemon.Name, token));
+                descriptor.UseNamedApiResourceField<TypePokemon, Pokemon, PokemonType>(x => x.Pokemon);
             }
         }
     }

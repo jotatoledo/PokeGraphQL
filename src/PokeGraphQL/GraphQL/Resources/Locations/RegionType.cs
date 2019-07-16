@@ -7,8 +7,6 @@
 
 namespace PokeGraphQL.GraphQL.Resources.Locations
 {
-    using System.Linq;
-    using System.Threading.Tasks;
     using HotChocolate.Types;
     using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources.Games;
@@ -20,44 +18,10 @@ namespace PokeGraphQL.GraphQL.Resources.Locations
         {
             descriptor.Description(@"A region is an organized area of the pokémon world. 
             Most often, the main difference between regions is the species of pokémon that can be encountered within them.");
-            descriptor.Field(x => x.Locations)
-                .Description("A list of locations that can be found in this region.")
-                .Type<ListType<LocationType>>()
-                .Resolver((ctx, token) =>
-                {
-                    var resolver = ctx.Service<LocationResolver>();
-                    var resourceTasks = ctx.Parent<Region>()
-                        .Locations
-                        .Select(location => resolver.GetLocationAsync(location.Name, token));
-                    return Task.WhenAll(resourceTasks);
-                });
-            descriptor.Field(x => x.MainGeneration)
-                .Description("The generation this region was introduced in.")
-                .Type<GenerationType>()
-                .Resolver((ctx, token) => ctx.Service<GameResolver>().GetGenerationAsync(ctx.Parent<Region>().MainGeneration.Name, token));
-            descriptor.Field(x => x.Pokedexes)
-                .Name("pokedexes")
-                .Description("A list of pokédexes that catalogue pokemon in this region.")
-                .Type<ListType<PokedexType>>()
-                .Resolver((ctx, token) =>
-                {
-                    var resolver = ctx.Service<GameResolver>();
-                    var resourceTasks = ctx.Parent<Region>()
-                        .Pokedexes
-                        .Select(pokedex => resolver.GetPokedexAsync(pokedex.Name, token));
-                    return Task.WhenAll(resourceTasks);
-                });
-            descriptor.Field(x => x.VersionGroups)
-                .Description("A list of version groups where this region can be visited.")
-                .Type<ListType<VersionGroupType>>()
-                .Resolver((ctx, token) =>
-                {
-                    var resolver = ctx.Service<GameResolver>();
-                    var resourceTasks = ctx.Parent<Region>()
-                        .VersionGroups
-                        .Select(versionGroup => resolver.GetVersionGroupAsync(versionGroup.Name, token));
-                    return Task.WhenAll(resourceTasks);
-                });
+            descriptor.UseNamedApiResourceCollectionField<Region, Location, LocationType>(x => x.Locations);
+            descriptor.UseNamedApiResourceField<Region, Generation, GenerationType>(x => x.MainGeneration);
+            descriptor.UseNamedApiResourceCollectionField<Region, Pokedex, PokedexType>(x => x.Pokedexes);
+            descriptor.UseNamedApiResourceCollectionField<Region, VersionGroup, VersionGroupType>(x => x.VersionGroups);
         }
     }
 }

@@ -34,14 +34,8 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
                 .Description("Whether or not this form requires mega evolution.");
             descriptor.Field(x => x.FormName)
                 .Description("The name of this form.");
-            descriptor.Field(x => x.Pokemon)
-                .Description("The pokémon that can take on this form.")
-                .Type<PokemonType>()
-                .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetPokemonAsync(ctx.Parent<PokemonForm>().Pokemon.Name, token));
-            descriptor.Field(x => x.VersionGroup)
-                .Description("The version group this pokémon form was introduced in.")
-                .Type<VersionGroupType>()
-                .Resolver((ctx, token) => ctx.Service<GameResolver>().GetVersionGroupAsync(ctx.Parent<PokemonForm>().VersionGroup.Name, token));
+            descriptor.UseNamedApiResourceField<PokemonForm, Pokemon, PokemonType>(x => x.Pokemon);
+            descriptor.UseNamedApiResourceField<PokemonForm, VersionGroup, VersionGroupType>(x => x.VersionGroup);
         }
     }
 }

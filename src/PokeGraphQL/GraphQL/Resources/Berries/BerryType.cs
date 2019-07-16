@@ -20,18 +20,9 @@ namespace PokeGraphQL.GraphQL.Resources.Berries
             descriptor.Description("Berries are small fruits that can provide HP and status condition restoration, stat enhancement, and even damage negation when eaten by pokemon.");
             descriptor.Field(x => x.Flavors)
                 .Type<ListType<BerryFlavorMapType>>();
-            descriptor.Field(x => x.NaturalGiftType)
-                .Type<TypePropertyType>()
-                .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetTypeAsync(ctx.Parent<Berry>().NaturalGiftType.Name, token));
-            descriptor.Field(x => x.GrowthTime)
-                .Type<IntType>();
-            descriptor.Field(x => x.Firmness)
-                .Type<BerryFirmnessType>()
-                .Resolver((ctx, token) => ctx.Service<BerryResolver>().GetBerryFirmnessAsync(ctx.Parent<Berry>().Firmness.Name, token));
-            descriptor.Field(x => x.Item)
-                .Description("Berries are actually items. This is a reference to the item specific data for this berry.")
-                .Type<ItemType>()
-                .Resolver((ctx, token) => ctx.Service<ItemResolver>().GetItemAsync(ctx.Parent<Berry>().Item.Name, token));
+            descriptor.UseNamedApiResourceField<Berry, Type, TypePropertyType>(x => x.NaturalGiftType);
+            descriptor.UseNamedApiResourceField<Berry, BerryFirmness, BerryFirmnessType>(x => x.Firmness);
+            descriptor.UseNamedApiResourceField<Berry, Item, ItemType>(x => x.Item);
         }
 
         private sealed class BerryFlavorMapType : ObjectType<BerryFlavorMap>
@@ -41,10 +32,7 @@ namespace PokeGraphQL.GraphQL.Resources.Berries
             {
                 descriptor.Field(x => x.Potency)
                     .Description("How powerful the referenced flavor is for this berry.");
-                descriptor.Field(x => x.Flavor)
-                    .Description("The referenced berry flavor.")
-                    .Type<BerryFlavorType>()
-                    .Resolver((ctx, token) => ctx.Service<BerryResolver>().GetBerryFlavorAsync(ctx.Parent<BerryFlavorMap>().Flavor.Name, token));
+                descriptor.UseNamedApiResourceField<BerryFlavorMap, BerryFlavor, BerryFlavorType>(x => x.Flavor);
             }
         }
     }

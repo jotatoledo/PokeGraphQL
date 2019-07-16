@@ -7,7 +7,6 @@
 
 namespace PokeGraphQL.GraphQL.Resources.Moves
 {
-    using System;
     using System.Linq;
     using System.Threading.Tasks;
     using DotNetFunctional.Maybe;
@@ -42,28 +41,16 @@ namespace PokeGraphQL.GraphQL.Resources.Moves
             descriptor.Field(x => x.ContestCombos)
                 .Description("A detail of normal and super contest combos that require this move.")
                 .Type<ContestComboSetsType>();
-            descriptor.Field(x => x.ContestType)
-                .Description("The type of appeal this move gives a pokémon when used in a contest.")
-                .Type<ContestTypeType>()
-                .Resolver((ctx, token) => ctx.Service<ContestResolver>().GetContestTypeAsync(ctx.Parent<Move>().ContestType.Name, token));
-            descriptor.Field(x => x.ContestEffect)
-                .Description("The effect the move has when used in a contest.")
-                .Type<ContestEffectType>()
-                .Resolver((ctx, token) => ctx.Service<ContestResolver>().GetContestEffectAsync(Convert.ToInt32(ctx.Parent<Move>().ContestEffect.Url.LastSegment()), token));
-            descriptor.Field(x => x.DamageClass)
-                .Description("The type of damage the move inflicts on the target, e.g. physical.")
-                .Type<MoveDamageClassType>()
-                .Resolver((ctx, token) => ctx.Service<MoveResolver>().GetMoveDamageClassAsync(ctx.Parent<Move>().DamageClass.Name, token));
+            descriptor.UseNamedApiResourceField<Move, ContestType, ContestTypeType>(x => x.ContestType);
+            descriptor.UseApiResourceField<Move, ContestEffect, ContestEffectType>(x => x.ContestEffect);
+            descriptor.UseNamedApiResourceField<Move, MoveDamageClass, MoveDamageClassType>(x => x.DamageClass);
             descriptor.Field(x => x.EffectEntries)
                 .Description("The effect of this move listed in different languages.")
-                .Ignore();
+                .Type<ListType<VerboseEffectType>>();
             descriptor.Field(x => x.EffectChanges)
                 .Description("The list of previous effects this move has had across version groups of the games.")
                 .Type<ListType<AbilityEffectChangeType>>();
-            descriptor.Field(x => x.Generation)
-                .Description("The generation in which this move was introduced.")
-                .Type<GenerationType>()
-                .Resolver((ctx, token) => ctx.Service<GameResolver>().GetGenerationAsync(ctx.Parent<Move>().Generation.Name, token));
+            descriptor.UseNamedApiResourceField<Move, Generation, GenerationType>(x => x.Generation);
             descriptor.Field(x => x.Meta)
                 .Description("Meta data about this move.")
                 .Type<MoveMetaDataType>();
@@ -73,18 +60,9 @@ namespace PokeGraphQL.GraphQL.Resources.Moves
             descriptor.Field(x => x.StatChanges)
                 .Description("A list of stats this moves effects and how much it effects them.")
                 .Type<ListType<MoveStatChangeType>>();
-            descriptor.Field(x => x.SuperContestEffect)
-                .Description("The effect the move has when used in a super contest.")
-                .Type<SuperContestEffectType>()
-                .Resolver((ctx, token) => ctx.Service<ContestResolver>().GetSuperContestEffectAsync(Convert.ToInt32(ctx.Parent<Move>().SuperContestEffect.Url.LastSegment()), token));
-            descriptor.Field(x => x.Target)
-                .Description("The type of target that will recieve the effects of the attack.")
-                .Type<MoveTargetType>()
-                .Resolver((ctx, token) => ctx.Service<MoveResolver>().GetMoveTargetAsync(ctx.Parent<Move>().Target.Name, token));
-            descriptor.Field(x => x.Type)
-                .Description("The elemental type of this move.")
-                .Type<TypePropertyType>()
-                .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetTypeAsync(ctx.Parent<Move>().Type.Name, token));
+            descriptor.UseApiResourceField<Move, SuperContestEffect, SuperContestEffectType>(x => x.SuperContestEffect);
+            descriptor.UseNamedApiResourceField<Move, MoveTarget, MoveTargetType>(x => x.Target);
+            descriptor.UseNamedApiResourceField<Move, Type, TypePropertyType>(x => x.Type);
             descriptor.Field(x => x.Machines)
                 .Type<ListType<MachineVersionDetailType>>();
         }
@@ -104,14 +82,8 @@ namespace PokeGraphQL.GraphQL.Resources.Moves
                 descriptor.Field(x => x.EffectEntries)
                     .Description("The effect of this move listed in different languages.")
                     .Ignore();
-                descriptor.Field(x => x.Type)
-                    .Description("The elemental type of this move.")
-                    .Type<TypePropertyType>()
-                    .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetTypeAsync(ctx.Parent<PastMoveStatValues>().Type.Name, token));
-                descriptor.Field(x => x.VersionGroup)
-                    .Description("The version group in which these move stat values were in effect.")
-                    .Type<VersionGroupType>()
-                    .Resolver((ctx, token) => ctx.Service<GameResolver>().GetVersionGroupAsync(ctx.Parent<PastMoveStatValues>().VersionGroup.Name, token));
+                descriptor.UseNamedApiResourceField<PastMoveStatValues, Type, TypePropertyType>(x => x.Type);
+                descriptor.UseNamedApiResourceField<PastMoveStatValues, VersionGroup, VersionGroupType>(x => x.VersionGroup);
             }
         }
 
@@ -121,10 +93,7 @@ namespace PokeGraphQL.GraphQL.Resources.Moves
             {
                 descriptor.Field(x => x.Change)
                     .Description("The amount of change.");
-                descriptor.Field(x => x.Stat)
-                    .Description("The stat being affected.")
-                    .Type<StatType>()
-                    .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetStatAsync(ctx.Parent<MoveStatChange>().Stat.Name, token));
+                descriptor.UseNamedApiResourceField<MoveStatChange, Stat, StatType>(x => x.Stat);
             }
         }
 
@@ -141,7 +110,7 @@ namespace PokeGraphQL.GraphQL.Resources.Moves
                         return MonadMaybe.Lift(ctx.Parent<ContestComboDetail>())
                             .Select(x => x.UseBefore)
                             .Select(moves => moves.Select(move => resolver.GetMoveAsync(move.Name, token)))
-                            .Match(value => Task.WhenAll(value), Task.FromResult<Move[]>(default));
+                            .Match(Task.WhenAll, Task.FromResult<Move[]>(default));
                     });
                 descriptor.Field(x => x.UseAfter)
                     .Description("A list of moves to use after this move.")
@@ -152,7 +121,7 @@ namespace PokeGraphQL.GraphQL.Resources.Moves
                         return MonadMaybe.Lift(ctx.Parent<ContestComboDetail>())
                             .Select(x => x.UseAfter)
                             .Select(moves => moves.Select(move => resolver.GetMoveAsync(move.Name, token)))
-                            .Match(val => Task.WhenAll(val), Task.FromResult<Move[]>(default));
+                            .Match(Task.WhenAll, Task.FromResult<Move[]>(default));
                     });
             }
         }
@@ -175,13 +144,12 @@ namespace PokeGraphQL.GraphQL.Resources.Moves
             /// <inheritdoc/>
             protected override void Configure(IObjectTypeDescriptor<MoveMetaData> descriptor)
             {
-                descriptor.Field(x => x.Ailment)
-                    .Description("	The status ailment this move inflicts on its target.")
-                    .Type<MoveAilmentType>()
-                    .Resolver((ctx, token) => ctx.Service<MoveResolver>().GetMoveAilmentAsync(ctx.Parent<MoveMetaData>().Ailment.Name, token));
+                descriptor.UseNamedApiResourceField<MoveMetaData, MoveAilment, MoveAilmentType>(x => x.Ailment);
+
+                // TODO change type in upstream to NamedApiResource<MoveCategory>
                 descriptor.Field(x => x.Category)
                     .Description("The category of move this move falls under, e.g. damage or ailment.")
-                    .Type<MoveCategoryType>()
+                    .Type<NonNullType<MoveCategoryType>>()
                     .Resolver((ctx, token) => ctx.Service<MoveResolver>().GetMoveCategoryAsync(ctx.Parent<MoveMetaData>().Category.Name, token));
                 descriptor.Field(x => x.MinHits)
                     .Description("The minimum number of times this move hits. Null if it always only hits once.");
