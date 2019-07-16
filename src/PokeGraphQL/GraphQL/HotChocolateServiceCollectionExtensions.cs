@@ -1,4 +1,4 @@
-﻿// <copyright file="HotChocolateExtensions.cs" company="PokeGraphQL.Net">
+﻿// <copyright file="HotChocolateServiceCollectionExtensions.cs" company="PokeGraphQL.Net">
 // Copyright (c) PokeGraphQL.Net. All rights reserved.
 //
 // Licensed under the MIT license.
@@ -25,7 +25,7 @@ namespace PokeGraphQL.GraphQL
     using PokeGraphQL.GraphQL.Resources.Moves;
     using PokeGraphQL.GraphQL.Resources.Pokemons;
 
-    internal static class HotChocolateExtensions
+    internal static class HotChocolateServiceCollectionExtensions
     {
         internal static IServiceCollection AddHotChocolate(this IServiceCollection services)
         {

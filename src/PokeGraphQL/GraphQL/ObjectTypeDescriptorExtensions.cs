@@ -1,4 +1,4 @@
-﻿// <copyright file="IObjectTypeDescriptorPagingExtensions.cs" company="PokeGraphQL.Net">
+﻿// <copyright file="ObjectTypeDescriptorExtensions.cs" company="PokeGraphQL.Net">
 // Copyright (c) PokeGraphQL.Net. All rights reserved.
 //
 // Licensed under the MIT license.
@@ -13,7 +13,7 @@ namespace PokeGraphQL.GraphQL
     using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources;
 
-    internal static class IObjectTypeDescriptorPagingExtensions
+    internal static class ObjectTypeDescriptorExtensions
     {
         internal static IObjectFieldDescriptor UseApiResource<TResourceType, TSchemaType>(this IObjectFieldDescriptor descriptor)
             where TResourceType : ApiResource
