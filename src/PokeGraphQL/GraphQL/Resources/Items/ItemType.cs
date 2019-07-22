@@ -26,12 +26,7 @@ namespace PokeGraphQL.GraphQL.Resources.Items
                 .Description("The power of the move Fling when used with this item.");
             descriptor.UseNullableNamedApiResourceField<Item, ItemFlingEffect, ItemFlingEffectType>(x => x.FlingEffect);
             descriptor.UseNamedApiResourceCollectionField<Item, ItemAttribute, ItemAttributeType>(x => x.Attributes);
-
-            // TODO change type in upstream to NamedApiResource<ItemCategor>, refactor once its done
-            descriptor.Field(x => x.Category)
-                .Description("The category of items this item falls into.")
-                .Type<ItemCategoryType>()
-                .Resolver((ctx, token) => ctx.Service<ItemResolver>().GetCategoryAsync(ctx.Parent<Item>().Category.Name, token));
+            descriptor.UseNamedApiResourceField<Item, ItemCategory, ItemCategoryType>(x => x.Category);
             descriptor.Field(x => x.HeldByPokemon)
                 .Description("A list of pokémon that might be found in the wild holding this item.")
                 .Type<ListType<ItemHolderPokemonType>>();

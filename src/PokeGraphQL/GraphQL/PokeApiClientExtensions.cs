@@ -17,7 +17,7 @@ namespace PokeGraphQL.GraphQL
         internal static Task<TResource> GetResourceFromParamAsync<TResource>(this PokeApiClient client, string nameOrId, CancellationToken cancellationToken = default)
             where TResource : ResourceBase =>
         int.TryParse(nameOrId, out var id)
-                ? client.GetResourceAsync<TResource>(id)
-                : client.GetResourceAsync<TResource>(nameOrId);
+                ? client.GetResourceAsync<TResource>(id, cancellationToken)
+                : client.GetResourceAsync<TResource>(nameOrId, cancellationToken);
     }
 }

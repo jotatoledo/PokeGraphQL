@@ -20,7 +20,7 @@ namespace PokeGraphQL.GraphQL
             where TSchemaType : ObjectType<TResourceType> =>
             descriptor.Type<TSchemaType>()
                 .Argument("id", a => a.Type<NonNullType<IntType>>().Description("The identifier for the resource."))
-                .Resolver(ctx => ctx.Service<PokeApiClient>().GetResourceAsync<TResourceType>(ctx.Argument<int>("id")));
+                .Resolver((ctx, token) => ctx.Service<PokeApiClient>().GetResourceAsync<TResourceType>(ctx.Argument<int>("id"), token));
 
         internal static IObjectFieldDescriptor UseNamedApiResource<TResourceType, TSchemaType>(this IObjectFieldDescriptor descriptor)
             where TResourceType : NamedApiResource

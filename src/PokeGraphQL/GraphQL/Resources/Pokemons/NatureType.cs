@@ -18,10 +18,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
         protected override void ConcreteConfigure(IObjectTypeDescriptor<Nature> descriptor)
         {
             descriptor.Description("Natures influence how a pokémon's stats grow.");
-
-            // TODO fix typo in upstream
-            descriptor.UseNamedApiResourceField<Nature, Stat, StatType>(x => x.DescreasedStat)
-                .Name("decreasedStat");
+            descriptor.UseNamedApiResourceField<Nature, Stat, StatType>(x => x.DecreasedStat);
             descriptor.UseNamedApiResourceField<Nature, Stat, StatType>(x => x.IncreasedStat);
             descriptor.UseNamedApiResourceField<Nature, BerryFlavor, BerryFlavorType>(x => x.HatesFlavor);
             descriptor.UseNamedApiResourceField<Nature, BerryFlavor, BerryFlavorType>(x => x.LikesFlavor);
@@ -52,13 +49,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
             {
                 descriptor.Field(x => x.MaxChange)
                     .Description("The amount of change.");
-
-                // TODO type should be changed in upstream to NamedApiResource<PokeAthlonStat>
-                // See https://pokeapi.co/api/v2/nature/1
-                descriptor.Field(x => x.PokeathlonStat)
-                    .Description("The stat being affected.")
-                    .Type<PokeathlonStatType>()
-                    .Resolver((ctx, token) => ctx.Service<PokemonResolver>().GetPokeathlonStatAsync(ctx.Parent<NatureStatChange>().PokeathlonStat.Name, token));
+                descriptor.UseNamedApiResourceField<NatureStatChange, PokeathlonStat, PokeathlonStatType>(x => x.PokeathlonStat);
             }
         }
     }

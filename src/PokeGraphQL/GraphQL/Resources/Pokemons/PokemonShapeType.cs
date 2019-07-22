@@ -7,8 +7,6 @@
 
 namespace PokeGraphQL.GraphQL.Resources.Pokemons
 {
-    using System.Linq;
-    using System.Threading.Tasks;
     using HotChocolate.Types;
     using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources.Languages;
@@ -22,19 +20,7 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
             descriptor.Field(x => x.AwesomeNames)
                 .Description("The \"scientific\" name of this pokémon shape listed in different languages.")
                 .Type<ListType<AwesomeNameType>>();
-
-            // TODO refactor once type in upstream is changed to List<NamedApiResource<PokemonSpecies>>
-            descriptor.Field(x => x.PokemonSpecies)
-                .Description("A list of the pokémon species that have this shape.")
-                .Type<ListType<PokemonSpeciesType>>()
-                .Resolver((ctx, token) =>
-                {
-                    var resolver = ctx.Service<PokemonResolver>();
-                    var resourceTasks = ctx.Parent<PokemonShape>()
-                        .PokemonSpecies
-                        .Select(species => resolver.GetPokemonSpeciesAsync(species.Name, token));
-                    return Task.WhenAll(resourceTasks);
-                });
+            descriptor.UseNamedApiResourceCollectionField<PokemonShape, PokemonSpecies, PokemonSpeciesType>(x => x.PokemonSpecies);
         }
 
         private sealed class AwesomeNameType : ObjectType<AwesomeNames>

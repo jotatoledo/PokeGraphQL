@@ -29,9 +29,7 @@ namespace PokeGraphQL.GraphQL.Resources.Games
             descriptor.UseNamedApiResourceCollectionField<Pokedex, VersionGroup, VersionGroupType>(x => x.VersionGroups);
 
             // TODO: implement ignored field
-            descriptor.Field(x => x.Descriptions)
-                .Description("The description of this pokédex listed in different languages.")
-                .Ignore();
+            descriptor.Ignore(x => x.Descriptions);
         }
 
         private sealed class PokemonEntryType : ObjectType<PokemonEntry>

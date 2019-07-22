@@ -32,8 +32,8 @@ namespace PokeGraphQL.GraphQL.Resources
             where TResource : NamedApiResource
         {
             var cursor = ParseCursor(cursorProps);
-            var resourcePage = await this.pokeApiClient.GetNamedResourcePageAsync<TResource>(pageSize.Value, cursor.OffSet);
-            var unrappedValues = await Task.WhenAll(resourcePage.Results.Select(this.pokeApiClient.GetResourceAsync));
+            var resourcePage = await this.pokeApiClient.GetNamedResourcePageAsync<TResource>(pageSize.Value, cursor.OffSet, cancellationToken);
+            var unrappedValues = await Task.WhenAll(resourcePage.Results.Select(val => this.pokeApiClient.GetResourceAsync(val, cancellationToken)));
             var edgeFactory = CreateEdgeFactory<TResource>(pageSize.Value);
             var edges = unrappedValues.Select(edgeFactory).ToList().AsReadOnly();
             return new Connection<TResource>(new ResourcePageInfo<TResource>(pageSize.Value, cursor.OffSet, resourcePage), edges);
@@ -43,8 +43,8 @@ namespace PokeGraphQL.GraphQL.Resources
             where TResource : ApiResource
         {
             var cursor = ParseCursor(cursorProps);
-            var resourcePage = await this.pokeApiClient.GetApiResourcePageAsync<TResource>(pageSize.Value, cursor.OffSet);
-            var unrappedValues = await Task.WhenAll(resourcePage.Results.Select(this.pokeApiClient.GetResourceAsync));
+            var resourcePage = await this.pokeApiClient.GetApiResourcePageAsync<TResource>(pageSize.Value, cursor.OffSet, cancellationToken);
+            var unrappedValues = await Task.WhenAll(resourcePage.Results.Select(val => this.pokeApiClient.GetResourceAsync(val, cancellationToken)));
             var edgeFactory = CreateEdgeFactory<TResource>(pageSize.Value);
             var edges = unrappedValues.Select(edgeFactory).ToList().AsReadOnly();
             return new Connection<TResource>(new ResourcePageInfo<TResource>(pageSize.Value, cursor.OffSet, resourcePage), edges);

@@ -16,8 +16,6 @@ namespace PokeGraphQL.GraphQL.Resources.Common
         /// <inheritdoc/>
         protected override void Configure(IObjectTypeDescriptor<AbilityEffectChange> descriptor)
         {
-            // TODO type should be changed upstream to `List<Effects>`
-            // See 'effect_changes' structure in https://pokeapi.co/api/v2/ability/1
             descriptor.Field(x => x.EffectEntries)
                 .Description("The previous effect of this ability listed in different languages.")
                 .Type<ListType<EffectsType>>();
