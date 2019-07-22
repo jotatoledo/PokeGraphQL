@@ -9,7 +9,6 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
 {
     using HotChocolate.Types;
     using PokeApiNet.Models;
-    using PokeGraphQL.GraphQL.Resources.Common;
     using PokeGraphQL.GraphQL.Resources.Evolutions;
     using PokeGraphQL.GraphQL.Resources.Games;
     using PokeGraphQL.GraphQL.Resources.Languages;
@@ -61,11 +60,17 @@ namespace PokeGraphQL.GraphQL.Resources.Pokemons
             descriptor.Field(x => x.Varieties)
                 .Description("A list of the pokémon that exist within this pokémon species.")
                 .Type<ListType<PokemonSpeciesVarietyType>>();
-
-            // TODO type should be changed in upstream to {version,language,flavor_text}[]; FlavorTexts is only {flavor_text, language}
-            // See https://pokeapi.co/api/v2/pokemon-species/1
             descriptor.Field(x => x.FlavorTextEntries)
-                .Type<ListType<FlavorTextType>>();
+                .Type<ListType<PokemonSpeciesFlavorTextsType>>();
+        }
+
+        private sealed class PokemonSpeciesFlavorTextsType : ObjectType<PokemonSpeciesFlavorTexts>
+        {
+            protected override void Configure(IObjectTypeDescriptor<PokemonSpeciesFlavorTexts> descriptor)
+            {
+                descriptor.UseNamedApiResourceField<PokemonSpeciesFlavorTexts, Language, LanguageType>(x => x.Language);
+                descriptor.UseNamedApiResourceField<PokemonSpeciesFlavorTexts, Version, VersionType>(x => x.Version);
+            }
         }
 
         private sealed class PokemonSpeciesVarietyType : ObjectType<PokemonSpeciesVariety>

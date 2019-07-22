@@ -16,8 +16,6 @@ namespace PokeGraphQL.GraphQL.Resources.Contests
         /// <inheritdoc/>
         protected override void ConcreteConfigure(IObjectTypeDescriptor<ContestType> descriptor)
         {
-            // TODO: create issue about overwritten class properties bounded implicitely
-            descriptor.BindFields(BindingBehavior.Explicit);
             descriptor.Description("Contest types are categories judges used to weigh a pokémon's condition in pokemon contests.");
             descriptor.Field(x => x.Name)
                 .Description($"The name for this {this.ResourceName} resource.")

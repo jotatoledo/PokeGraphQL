@@ -145,12 +145,8 @@ namespace PokeGraphQL.GraphQL.Resources.Moves
             protected override void Configure(IObjectTypeDescriptor<MoveMetaData> descriptor)
             {
                 descriptor.UseNamedApiResourceField<MoveMetaData, MoveAilment, MoveAilmentType>(x => x.Ailment);
-
-                // TODO change type in upstream to NamedApiResource<MoveCategory>
-                descriptor.Field(x => x.Category)
-                    .Description("The category of move this move falls under, e.g. damage or ailment.")
-                    .Type<NonNullType<MoveCategoryType>>()
-                    .Resolver((ctx, token) => ctx.Service<MoveResolver>().GetMoveCategoryAsync(ctx.Parent<MoveMetaData>().Category.Name, token));
+                descriptor.UseNamedApiResourceField<MoveMetaData, MoveCategory, MoveCategoryType>(x => x.Category)
+                    .Description("The category of move this move falls under, e.g. damage or ailment.");
                 descriptor.Field(x => x.MinHits)
                     .Description("The minimum number of times this move hits. Null if it always only hits once.");
                 descriptor.Field(x => x.MaxHits)
