@@ -25,7 +25,7 @@ namespace PokeGraphQL.GraphQL.Resources
         public virtual async Task<T> GetAsync<T>(string path, CancellationToken cancellationToken = default)
         {
             // TODO handle cache
-            var response = await this.httpClient.GetAsync(new Uri(path, UriKind.Absolute));
+            var response = await this.httpClient.GetAsync(new Uri(path, UriKind.Absolute), cancellationToken);
             response.EnsureSuccessStatusCode();
             return JsonConvert.DeserializeObject<T>(await response.Content.ReadAsStringAsync());
         }

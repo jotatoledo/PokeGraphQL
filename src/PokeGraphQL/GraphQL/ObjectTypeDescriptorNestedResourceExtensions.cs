@@ -25,9 +25,9 @@ namespace PokeGraphQL.GraphQL
             where TSchemaType : ObjectType<TTarget> =>
             descriptor.Field(fieldSelector)
                 .Type<TSchemaType>()
-                .Resolver(ctx => Maybe.Lift(ctx.Parent<TSource>())
+                .Resolver((ctx, token) => Maybe.Lift(ctx.Parent<TSource>())
                     .Select(fieldSelector.Compile())
-                    .Match(ctx.Service<PokeApiClient>().GetResourceAsync, Task.FromResult<TTarget>(default)));
+                    .Match(val => ctx.Service<PokeApiClient>().GetResourceAsync(val, token), Task.FromResult<TTarget>(default)));
 
         internal static IObjectFieldDescriptor UseNamedApiResourceCollectionField<TSource, TTarget, TSchemaType>(
             this IObjectTypeDescriptor<TSource> descriptor,
@@ -36,7 +36,7 @@ namespace PokeGraphQL.GraphQL
             where TSchemaType : ObjectType<TTarget> =>
             descriptor.Field(fieldSelector)
                 .Type<ListType<TSchemaType>>()
-                .Resolver((ctx, token) => ctx.Service<PokeApiClient>().GetResourceAsync(fieldSelector.Compile()(ctx.Parent<TSource>())));
+                .Resolver((ctx, token) => ctx.Service<PokeApiClient>().GetResourceAsync(fieldSelector.Compile()(ctx.Parent<TSource>()), token));
 
         internal static IObjectFieldDescriptor UseNamedApiResourceField<TSource, TTarget, TSchemaType>(
             this IObjectTypeDescriptor<TSource> descriptor,
@@ -45,7 +45,7 @@ namespace PokeGraphQL.GraphQL
             where TSchemaType : ObjectType<TTarget> =>
             descriptor.Field(fieldSelector)
                 .Type<NonNullType<TSchemaType>>()
-                .Resolver((ctx, token) => ctx.Service<PokeApiClient>().GetResourceAsync(fieldSelector.Compile()(ctx.Parent<TSource>())));
+                .Resolver((ctx, token) => ctx.Service<PokeApiClient>().GetResourceAsync(fieldSelector.Compile()(ctx.Parent<TSource>()), token));
 
         internal static IObjectFieldDescriptor UseNullableApiResourceField<TSource, TTarget, TSchemaType>(
             this IObjectTypeDescriptor<TSource> descriptor,
@@ -54,9 +54,9 @@ namespace PokeGraphQL.GraphQL
             where TSchemaType : ObjectType<TTarget> =>
             descriptor.Field(fieldSelector)
                 .Type<TSchemaType>()
-                .Resolver(ctx => Maybe.Lift(ctx.Parent<TSource>())
+                .Resolver((ctx, token) => Maybe.Lift(ctx.Parent<TSource>())
                     .Select(fieldSelector.Compile())
-                    .Match(ctx.Service<PokeApiClient>().GetResourceAsync, Task.FromResult<TTarget>(default)));
+                    .Match(val => ctx.Service<PokeApiClient>().GetResourceAsync(val, token), Task.FromResult<TTarget>(default)));
 
         internal static IObjectFieldDescriptor UseApiResourceCollectionField<TSource, TTarget, TSchemaType>(
             this IObjectTypeDescriptor<TSource> descriptor,
@@ -65,7 +65,7 @@ namespace PokeGraphQL.GraphQL
             where TSchemaType : ObjectType<TTarget> =>
             descriptor.Field(fieldSelector)
                 .Type<ListType<TSchemaType>>()
-                .Resolver((ctx, token) => ctx.Service<PokeApiClient>().GetResourceAsync(fieldSelector.Compile()(ctx.Parent<TSource>())));
+                .Resolver((ctx, token) => ctx.Service<PokeApiClient>().GetResourceAsync(fieldSelector.Compile()(ctx.Parent<TSource>()), token));
 
         internal static IObjectFieldDescriptor UseApiResourceField<TSource, TTarget, TSchemaType>(
             this IObjectTypeDescriptor<TSource> descriptor,
@@ -74,6 +74,6 @@ namespace PokeGraphQL.GraphQL
             where TSchemaType : ObjectType<TTarget> =>
             descriptor.Field(fieldSelector)
                 .Type<NonNullType<TSchemaType>>()
-                .Resolver((ctx, token) => ctx.Service<PokeApiClient>().GetResourceAsync(fieldSelector.Compile()(ctx.Parent<TSource>())));
+                .Resolver((ctx, token) => ctx.Service<PokeApiClient>().GetResourceAsync(fieldSelector.Compile()(ctx.Parent<TSource>()), token));
     }
 }
