@@ -7,16 +7,12 @@
 
 namespace PokeGraphQL.GraphQL.Resources.Moves
 {
-    using System.Linq;
-    using System.Threading.Tasks;
-    using DotNetFunctional.Maybe;
     using HotChocolate.Types;
     using PokeApiNet.Models;
     using PokeGraphQL.GraphQL.Resources.Common;
     using PokeGraphQL.GraphQL.Resources.Contests;
     using PokeGraphQL.GraphQL.Resources.Games;
     using PokeGraphQL.GraphQL.Resources.Pokemons;
-    using MonadMaybe = DotNetFunctional.Maybe.Maybe;
 
     internal sealed class MoveType : BaseNamedApiObjectType<Move>
     {
@@ -101,28 +97,10 @@ namespace PokeGraphQL.GraphQL.Resources.Moves
         {
             protected override void Configure(IObjectTypeDescriptor<ContestComboDetail> descriptor)
             {
-                descriptor.Field(x => x.UseBefore)
-                    .Description("A list of moves to use before this move.")
-                    .Type<ListType<MoveType>>()
-                    .Resolver((ctx, token) =>
-                    {
-                        var resolver = ctx.Service<MoveResolver>();
-                        return MonadMaybe.Lift(ctx.Parent<ContestComboDetail>())
-                            .Select(x => x.UseBefore)
-                            .Select(moves => moves.Select(move => resolver.GetMoveAsync(move.Name, token)))
-                            .Match(Task.WhenAll, Task.FromResult<Move[]>(default));
-                    });
-                descriptor.Field(x => x.UseAfter)
-                    .Description("A list of moves to use after this move.")
-                    .Type<ListType<MoveType>>()
-                    .Resolver((ctx, token) =>
-                    {
-                        var resolver = ctx.Service<MoveResolver>();
-                        return MonadMaybe.Lift(ctx.Parent<ContestComboDetail>())
-                            .Select(x => x.UseAfter)
-                            .Select(moves => moves.Select(move => resolver.GetMoveAsync(move.Name, token)))
-                            .Match(Task.WhenAll, Task.FromResult<Move[]>(default));
-                    });
+                descriptor.UseNullableNamedApiResourceCollectionField<ContestComboDetail, Move, MoveType>(x => x.UseBefore)
+                    .Description("A list of moves to use before this move.");
+                descriptor.UseNullableNamedApiResourceCollectionField<ContestComboDetail, Move, MoveType>(x => x.UseAfter)
+                    .Description("A list of moves to use after this move.");
             }
         }
 
